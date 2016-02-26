@@ -1,0 +1,517 @@
+Archive member included because of file (symbol)
+
+/usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_exit.o)
+                              /usr/lib/gcc/avr/4.8.2/../../../avr/lib/avr5/crtm32u4.o (exit)
+/usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_tablejump.o)
+                              radio_main.o (__tablejump2__)
+/usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_copy_data.o)
+                              radio_main.o (__do_copy_data)
+/usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_clear_bss.o)
+                              radio_main.o (__do_clear_bss)
+
+Allocating common symbols
+Common symbol       size              file
+
+temp                0x1               radio_main.o
+data_array          0x4               radio_main.o
+payload_len         0x1               nrf24L01_plus-master/nrf24.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+text             0x0000000000000000 0x0000000000020000 xr
+data             0x0000000000800060 0x000000000000ffa0 rw !x
+eeprom           0x0000000000810000 0x0000000000010000 rw !x
+fuse             0x0000000000820000 0x0000000000000400 rw !x
+lock             0x0000000000830000 0x0000000000000400 rw !x
+signature        0x0000000000840000 0x0000000000000400 rw !x
+user_signatures  0x0000000000850000 0x0000000000000400 rw !x
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+Address of section .data set to 0x800100
+LOAD /usr/lib/gcc/avr/4.8.2/../../../avr/lib/avr5/crtm32u4.o
+LOAD radio_main.o
+LOAD nrf24L01_plus-master/nrf24.o
+LOAD ../uart.o
+START GROUP
+LOAD /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a
+LOAD /usr/lib/gcc/avr/4.8.2/../../../avr/lib/avr5/libm.a
+LOAD /usr/lib/gcc/avr/4.8.2/../../../avr/lib/avr5/libc.a
+END GROUP
+
+.hash
+ *(.hash)
+
+.dynsym
+ *(.dynsym)
+
+.dynstr
+ *(.dynstr)
+
+.gnu.version
+ *(.gnu.version)
+
+.gnu.version_d
+ *(.gnu.version_d)
+
+.gnu.version_r
+ *(.gnu.version_r)
+
+.rel.init
+ *(.rel.init)
+
+.rela.init
+ *(.rela.init)
+
+.rel.text
+ *(.rel.text)
+ *(.rel.text.*)
+ *(.rel.gnu.linkonce.t*)
+
+.rela.text
+ *(.rela.text)
+ *(.rela.text.*)
+ *(.rela.gnu.linkonce.t*)
+
+.rel.fini
+ *(.rel.fini)
+
+.rela.fini
+ *(.rela.fini)
+
+.rel.rodata
+ *(.rel.rodata)
+ *(.rel.rodata.*)
+ *(.rel.gnu.linkonce.r*)
+
+.rela.rodata
+ *(.rela.rodata)
+ *(.rela.rodata.*)
+ *(.rela.gnu.linkonce.r*)
+
+.rel.data
+ *(.rel.data)
+ *(.rel.data.*)
+ *(.rel.gnu.linkonce.d*)
+
+.rela.data
+ *(.rela.data)
+ *(.rela.data.*)
+ *(.rela.gnu.linkonce.d*)
+
+.rel.ctors
+ *(.rel.ctors)
+
+.rela.ctors
+ *(.rela.ctors)
+
+.rel.dtors
+ *(.rel.dtors)
+
+.rela.dtors
+ *(.rela.dtors)
+
+.rel.got
+ *(.rel.got)
+
+.rela.got
+ *(.rela.got)
+
+.rel.bss
+ *(.rel.bss)
+
+.rela.bss
+ *(.rela.bss)
+
+.rel.plt
+ *(.rel.plt)
+
+.rela.plt
+ *(.rela.plt)
+
+.text           0x0000000000000000      0x84e
+ *(.vectors)
+ .vectors       0x0000000000000000       0xac /usr/lib/gcc/avr/4.8.2/../../../avr/lib/avr5/crtm32u4.o
+                0x0000000000000000                __vectors
+                0x0000000000000000                __vector_default
+ *(.vectors)
+ *(.progmem.gcc*)
+ .progmem.gcc_sw_table
+                0x00000000000000ac       0x30 radio_main.o
+ *(.progmem*)
+                0x00000000000000dc                . = ALIGN (0x2)
+                0x00000000000000dc                __trampolines_start = .
+ *(.trampolines)
+ .trampolines   0x00000000000000dc        0x0 linker stubs
+ *(.trampolines*)
+                0x00000000000000dc                __trampolines_end = .
+ *(.jumptables)
+ *(.jumptables*)
+ *(.lowtext)
+ *(.lowtext*)
+                0x00000000000000dc                __ctors_start = .
+ *(.ctors)
+                0x00000000000000dc                __ctors_end = .
+                0x00000000000000dc                __dtors_start = .
+ *(.dtors)
+                0x00000000000000dc                __dtors_end = .
+ SORT(*)(.ctors)
+ SORT(*)(.dtors)
+ *(.init0)
+ .init0         0x00000000000000dc        0x0 /usr/lib/gcc/avr/4.8.2/../../../avr/lib/avr5/crtm32u4.o
+                0x00000000000000dc                __init
+ *(.init0)
+ *(.init1)
+ *(.init1)
+ *(.init2)
+ .init2         0x00000000000000dc        0xc /usr/lib/gcc/avr/4.8.2/../../../avr/lib/avr5/crtm32u4.o
+ *(.init2)
+ *(.init3)
+ *(.init3)
+ *(.init4)
+ .init4         0x00000000000000e8       0x16 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_copy_data.o)
+                0x00000000000000e8                __do_copy_data
+ .init4         0x00000000000000fe       0x10 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_clear_bss.o)
+                0x00000000000000fe                __do_clear_bss
+ *(.init4)
+ *(.init5)
+ *(.init5)
+ *(.init6)
+ *(.init6)
+ *(.init7)
+ *(.init7)
+ *(.init8)
+ *(.init8)
+ *(.init9)
+ .init9         0x000000000000010e        0x8 /usr/lib/gcc/avr/4.8.2/../../../avr/lib/avr5/crtm32u4.o
+ *(.init9)
+ *(.text)
+ .text          0x0000000000000116        0x4 /usr/lib/gcc/avr/4.8.2/../../../avr/lib/avr5/crtm32u4.o
+                0x0000000000000116                __vector_38
+                0x0000000000000116                __vector_22
+                0x0000000000000116                __vector_28
+                0x0000000000000116                __vector_1
+                0x0000000000000116                __vector_32
+                0x0000000000000116                __vector_34
+                0x0000000000000116                __vector_24
+                0x0000000000000116                __vector_12
+                0x0000000000000116                __bad_interrupt
+                0x0000000000000116                __vector_6
+                0x0000000000000116                __vector_31
+                0x0000000000000116                __vector_35
+                0x0000000000000116                __vector_39
+                0x0000000000000116                __vector_3
+                0x0000000000000116                __vector_23
+                0x0000000000000116                __vector_30
+                0x0000000000000116                __vector_25
+                0x0000000000000116                __vector_11
+                0x0000000000000116                __vector_13
+                0x0000000000000116                __vector_17
+                0x0000000000000116                __vector_19
+                0x0000000000000116                __vector_7
+                0x0000000000000116                __vector_41
+                0x0000000000000116                __vector_27
+                0x0000000000000116                __vector_5
+                0x0000000000000116                __vector_33
+                0x0000000000000116                __vector_37
+                0x0000000000000116                __vector_4
+                0x0000000000000116                __vector_9
+                0x0000000000000116                __vector_2
+                0x0000000000000116                __vector_21
+                0x0000000000000116                __vector_15
+                0x0000000000000116                __vector_36
+                0x0000000000000116                __vector_29
+                0x0000000000000116                __vector_40
+                0x0000000000000116                __vector_8
+                0x0000000000000116                __vector_26
+                0x0000000000000116                __vector_14
+                0x0000000000000116                __vector_10
+                0x0000000000000116                __vector_16
+                0x0000000000000116                __vector_18
+                0x0000000000000116                __vector_20
+                0x0000000000000116                __vector_42
+ .text          0x000000000000011a       0x7a radio_main.o
+                0x000000000000011a                port_init
+                0x0000000000000128                tcnt_init
+                0x000000000000015a                light_em_up
+ .text          0x0000000000000194      0x402 nrf24L01_plus-master/nrf24.o
+                0x000000000000019c                nrf24_payload_length
+                0x00000000000001a2                spi_transfer
+                0x00000000000001da                nrf24_payloadLength
+                0x0000000000000202                nrf24_getStatus
+                0x0000000000000224                nrf24_isSending
+                0x0000000000000234                nrf24_lastMessageStatus
+                0x000000000000024c                nrf24_transferSync
+                0x0000000000000284                nrf24_transmitSync
+                0x00000000000002ac                nrf24_configRegister
+                0x00000000000002d4                nrf24_getData
+                0x00000000000002fe                nrf24_powerUpRx
+                0x0000000000000320                nrf24_config
+                0x0000000000000392                nrf24_powerUpTx
+                0x00000000000003a2                nrf24_send
+                0x000000000000040e                nrf24_powerDown
+                0x0000000000000418                nrf24_readRegister
+                0x000000000000044a                nrf24_rxFifoEmpty
+                0x000000000000046e                nrf24_dataReady
+                0x00000000000004a6                nrf24_retransmissionCount
+                0x00000000000004ca                nrf24_writeRegister
+                0x000000000000051c                nrf24_rx_address
+                0x000000000000052c                nrf24_tx_address
+                0x000000000000054a                nrf24_setupPins
+                0x0000000000000556                nrf24_init
+                0x0000000000000560                nrf24_ce_digitalWrite
+                0x000000000000056c                nrf24_csn_digitalWrite
+                0x0000000000000578                nrf24_sck_digitalWrite
+                0x0000000000000584                nrf24_mosi_digitalWrite
+                0x0000000000000590                nrf24_miso_digitalRead
+ .text          0x0000000000000596       0x84 ../uart.o
+                0x0000000000000596                uart_init
+                0x00000000000005b6                uart_putc
+                0x00000000000005c4                uart_puts
+                0x00000000000005e2                uart_getc
+                0x00000000000005f0                uart_gets
+ .text          0x000000000000061a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_exit.o)
+ .text          0x000000000000061a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_tablejump.o)
+ .text          0x000000000000061a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_copy_data.o)
+ .text          0x000000000000061a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_clear_bss.o)
+                0x000000000000061a                . = ALIGN (0x2)
+ *(.text.*)
+ .text.startup  0x000000000000061a      0x224 radio_main.o
+                0x000000000000061a                main
+ .text.libgcc.mul
+                0x000000000000083e        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_exit.o)
+ .text.libgcc.div
+                0x000000000000083e        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_exit.o)
+ .text.libgcc   0x000000000000083e        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_exit.o)
+ .text.libgcc.prologue
+                0x000000000000083e        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_exit.o)
+ .text.libgcc.builtins
+                0x000000000000083e        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_exit.o)
+ .text.libgcc.fmul
+                0x000000000000083e        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_exit.o)
+ .text.libgcc.fixed
+                0x000000000000083e        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_exit.o)
+ .text.libgcc.mul
+                0x000000000000083e        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_tablejump.o)
+ .text.libgcc.div
+                0x000000000000083e        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_tablejump.o)
+ .text.libgcc   0x000000000000083e        0xc /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_tablejump.o)
+                0x000000000000083e                __tablejump2__
+                0x0000000000000842                __tablejump__
+ .text.libgcc.prologue
+                0x000000000000084a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_tablejump.o)
+ .text.libgcc.builtins
+                0x000000000000084a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_tablejump.o)
+ .text.libgcc.fmul
+                0x000000000000084a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_tablejump.o)
+ .text.libgcc.fixed
+                0x000000000000084a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_tablejump.o)
+ .text.libgcc.mul
+                0x000000000000084a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_copy_data.o)
+ .text.libgcc.div
+                0x000000000000084a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_copy_data.o)
+ .text.libgcc   0x000000000000084a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_copy_data.o)
+ .text.libgcc.prologue
+                0x000000000000084a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_copy_data.o)
+ .text.libgcc.builtins
+                0x000000000000084a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_copy_data.o)
+ .text.libgcc.fmul
+                0x000000000000084a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_copy_data.o)
+ .text.libgcc.fixed
+                0x000000000000084a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_copy_data.o)
+ .text.libgcc.mul
+                0x000000000000084a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_clear_bss.o)
+ .text.libgcc.div
+                0x000000000000084a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_clear_bss.o)
+ .text.libgcc   0x000000000000084a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_clear_bss.o)
+ .text.libgcc.prologue
+                0x000000000000084a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_clear_bss.o)
+ .text.libgcc.builtins
+                0x000000000000084a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_clear_bss.o)
+ .text.libgcc.fmul
+                0x000000000000084a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_clear_bss.o)
+ .text.libgcc.fixed
+                0x000000000000084a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_clear_bss.o)
+                0x000000000000084a                . = ALIGN (0x2)
+ *(.fini9)
+ .fini9         0x000000000000084a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_exit.o)
+                0x000000000000084a                exit
+                0x000000000000084a                _exit
+ *(.fini9)
+ *(.fini8)
+ *(.fini8)
+ *(.fini7)
+ *(.fini7)
+ *(.fini6)
+ *(.fini6)
+ *(.fini5)
+ *(.fini5)
+ *(.fini4)
+ *(.fini4)
+ *(.fini3)
+ *(.fini3)
+ *(.fini2)
+ *(.fini2)
+ *(.fini1)
+ *(.fini1)
+ *(.fini0)
+ .fini0         0x000000000000084a        0x4 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_exit.o)
+ *(.fini0)
+                0x000000000000084e                _etext = .
+
+.data           0x0000000000800100       0x3a load address 0x000000000000084e
+                0x0000000000800100                PROVIDE (__data_start, .)
+ *(.data)
+ .data          0x0000000000800100        0x0 /usr/lib/gcc/avr/4.8.2/../../../avr/lib/avr5/crtm32u4.o
+ .data          0x0000000000800100       0x3a radio_main.o
+                0x0000000000800100                light_val
+                0x0000000000800130                rx_address
+                0x0000000000800135                tx_address
+ .data          0x000000000080013a        0x0 nrf24L01_plus-master/nrf24.o
+ .data          0x000000000080013a        0x0 ../uart.o
+ .data          0x000000000080013a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_exit.o)
+ .data          0x000000000080013a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_tablejump.o)
+ .data          0x000000000080013a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_copy_data.o)
+ .data          0x000000000080013a        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_clear_bss.o)
+ *(.data*)
+ *(.rodata)
+ *(.rodata*)
+ *(.gnu.linkonce.d*)
+                0x000000000080013a                . = ALIGN (0x2)
+                0x000000000080013a                _edata = .
+                0x000000000080013a                PROVIDE (__data_end, .)
+
+.bss            0x000000000080013a        0x7
+                0x000000000080013a                PROVIDE (__bss_start, .)
+ *(.bss)
+ .bss           0x000000000080013a        0x0 /usr/lib/gcc/avr/4.8.2/../../../avr/lib/avr5/crtm32u4.o
+ .bss           0x000000000080013a        0x1 radio_main.o
+                0x000000000080013a                q
+ .bss           0x000000000080013b        0x0 nrf24L01_plus-master/nrf24.o
+ .bss           0x000000000080013b        0x0 ../uart.o
+ .bss           0x000000000080013b        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_exit.o)
+ .bss           0x000000000080013b        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_tablejump.o)
+ .bss           0x000000000080013b        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_copy_data.o)
+ .bss           0x000000000080013b        0x0 /usr/lib/gcc/avr/4.8.2/avr5/libgcc.a(_clear_bss.o)
+ *(.bss*)
+ *(COMMON)
+ COMMON         0x000000000080013b        0x5 radio_main.o
+                0x000000000080013b                temp
+                0x000000000080013c                data_array
+ COMMON         0x0000000000800140        0x1 nrf24L01_plus-master/nrf24.o
+                0x0000000000800140                payload_len
+                0x0000000000800141                PROVIDE (__bss_end, .)
+                0x000000000000084e                __data_load_start = LOADADDR (.data)
+                0x0000000000000888                __data_load_end = (__data_load_start + SIZEOF (.data))
+
+.noinit         0x0000000000800141        0x0
+                0x0000000000800141                PROVIDE (__noinit_start, .)
+ *(.noinit*)
+                0x0000000000800141                PROVIDE (__noinit_end, .)
+                0x0000000000800141                _end = .
+                0x0000000000800141                PROVIDE (__heap_start, .)
+
+.eeprom         0x0000000000810000        0x0
+ *(.eeprom*)
+                0x0000000000810000                __eeprom_end = .
+
+.fuse
+ *(.fuse)
+ *(.lfuse)
+ *(.hfuse)
+ *(.efuse)
+
+.lock
+ *(.lock*)
+
+.signature
+ *(.signature*)
+
+.user_signatures
+ *(.user_signatures*)
+
+.stab           0x0000000000000000     0x276c
+ *(.stab)
+ .stab          0x0000000000000000      0x6cc /usr/lib/gcc/avr/4.8.2/../../../avr/lib/avr5/crtm32u4.o
+ .stab          0x00000000000006cc      0x8dc radio_main.o
+                                        0x8e8 (size before relaxing)
+ .stab          0x0000000000000fa8     0x1290 nrf24L01_plus-master/nrf24.o
+                                       0x1458 (size before relaxing)
+ .stab          0x0000000000002238      0x534 ../uart.o
+                                        0x6fc (size before relaxing)
+
+.stabstr        0x0000000000000000     0x131e
+ *(.stabstr)
+ .stabstr       0x0000000000000000     0x131e /usr/lib/gcc/avr/4.8.2/../../../avr/lib/avr5/crtm32u4.o
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment        0x0000000000000000       0x11
+ *(.comment)
+ .comment       0x0000000000000000       0x11 radio_main.o
+                                         0x12 (size before relaxing)
+ .comment       0x0000000000000000       0x12 nrf24L01_plus-master/nrf24.o
+ .comment       0x0000000000000000       0x12 ../uart.o
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges
+ *(.debug_aranges)
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info
+ *(.debug_info)
+ *(.gnu.linkonce.wi.*)
+
+.debug_abbrev
+ *(.debug_abbrev)
+
+.debug_line
+ *(.debug_line)
+
+.debug_frame
+ *(.debug_frame)
+
+.debug_str
+ *(.debug_str)
+
+.debug_loc
+ *(.debug_loc)
+
+.debug_macinfo
+ *(.debug_macinfo)
+
+.debug_pubtypes
+ *(.debug_pubtypes)
+
+.debug_ranges
+ *(.debug_ranges)
+
+.debug_macro
+ *(.debug_macro)
+OUTPUT(radio_main.elf elf32-avr)
+LOAD linker stubs
