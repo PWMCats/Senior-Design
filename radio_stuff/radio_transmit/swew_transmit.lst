@@ -3,17 +3,17 @@ swew_transmit.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         0000003a  00800100  000006f2  00000786  2**0
+  0 .data         0000003a  00800100  0000074a  000007de  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         000006f2  00000000  00000000  00000094  2**1
+  1 .text         0000074a  00000000  00000000  00000094  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          00000007  0080013a  0080013a  000007c0  2**0
+  2 .bss          00000007  0080013a  0080013a  00000818  2**0
                   ALLOC
-  3 .stab         0000270c  00000000  00000000  000007c0  2**2
+  3 .stab         00002760  00000000  00000000  00000818  2**2
                   CONTENTS, READONLY, DEBUGGING
-  4 .stabstr      00001399  00000000  00000000  00002ecc  2**0
+  4 .stabstr      00001399  00000000  00000000  00002f78  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .comment      00000011  00000000  00000000  00004265  2**0
+  5 .comment      00000011  00000000  00000000  00004311  2**0
                   CONTENTS, READONLY
 
 Disassembly of section .text:
@@ -75,8 +75,8 @@ Disassembly of section .text:
   b8:	11 e0       	ldi	r17, 0x01	; 1
   ba:	a0 e0       	ldi	r26, 0x00	; 0
   bc:	b1 e0       	ldi	r27, 0x01	; 1
-  be:	e2 ef       	ldi	r30, 0xF2	; 242
-  c0:	f6 e0       	ldi	r31, 0x06	; 6
+  be:	ea e4       	ldi	r30, 0x4A	; 74
+  c0:	f7 e0       	ldi	r31, 0x07	; 7
   c2:	02 c0       	rjmp	.+4      	; 0xc8 <__do_copy_data+0x10>
   c4:	05 90       	lpm	r0, Z+
   c6:	0d 92       	st	X+, r0
@@ -98,7 +98,7 @@ Disassembly of section .text:
   da:	b1 07       	cpc	r27, r17
   dc:	e1 f7       	brne	.-8      	; 0xd6 <.do_clear_bss_loop>
   de:	0e 94 f5 02 	call	0x5ea	; 0x5ea <main>
-  e2:	0c 94 77 03 	jmp	0x6ee	; 0x6ee <_exit>
+  e2:	0c 94 a3 03 	jmp	0x746	; 0x746 <_exit>
 
 000000e6 <__bad_interrupt>:
   e6:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
@@ -1494,174 +1494,216 @@ int main(void){
  602:	0e 94 7c 00 	call	0xf8	; 0xf8 <tcnt_init>
  uart_init();
  606:	0e 94 b3 02 	call	0x566	; 0x566 <uart_init>
+ //light_em_up(7);
+ nrf24_init();
+ 60a:	0e 94 93 02 	call	0x526	; 0x526 <nrf24_init>
+ nrf24_config(21,4); //channel #21, payload length 4
+ 60e:	64 e0       	ldi	r22, 0x04	; 4
+ 610:	85 e1       	ldi	r24, 0x15	; 21
+ 612:	0e 94 78 01 	call	0x2f0	; 0x2f0 <nrf24_config>
+
+ nrf24_tx_address(tx_address);
+ 616:	85 e0       	ldi	r24, 0x05	; 5
+ 618:	91 e0       	ldi	r25, 0x01	; 1
+ 61a:	0e 94 7e 02 	call	0x4fc	; 0x4fc <nrf24_tx_address>
+ nrf24_rx_address(rx_address);
+ 61e:	80 e0       	ldi	r24, 0x00	; 0
+ 620:	91 e0       	ldi	r25, 0x01	; 1
+ 622:	0e 94 76 02 	call	0x4ec	; 0x4ec <nrf24_rx_address>
+  snow = uart_getc();
+
+	//*****************************
+        // Radio Operation
+        /* Fill the data buffer */
+        data_array[0] = 0xFF;
+ 626:	cf ef       	ldi	r28, 0xFF	; 255
+
+ uint8_t start,light, track, snow; //for uart
+
+ while(1){ //serial forever
+
+  start = uart_getc();//wait for start byte
+ 628:	0e 94 d9 02 	call	0x5b2	; 0x5b2 <uart_getc>
+  light = uart_getc();
+ 62c:	0e 94 d9 02 	call	0x5b2	; 0x5b2 <uart_getc>
+ 630:	d8 2f       	mov	r29, r24
+  if(light == 5){light_em_up(BLUE);}
+ 632:	85 30       	cpi	r24, 0x05	; 5
+ 634:	09 f4       	brne	.+2      	; 0x638 <main+0x4e>
+ 636:	4d c0       	rjmp	.+154    	; 0x6d2 <main+0xe8>
+  if(light == 6){light_em_up(YELLOW);}
+ 638:	86 30       	cpi	r24, 0x06	; 6
+ 63a:	09 f4       	brne	.+2      	; 0x63e <main+0x54>
+ 63c:	67 c0       	rjmp	.+206    	; 0x70c <main+0x122>
+  if(light == 7){light_em_up(RED);}
+ 63e:	87 30       	cpi	r24, 0x07	; 7
+ 640:	c1 f4       	brne	.+48     	; 0x672 <main+0x88>
 }
 //*****************************
 
 //Assigns PWM bottom to vary wavelength
 void light_em_up(uint8_t i){
    OCR1A= light_val[i][2]; 
- 60a:	80 91 38 01 	lds	r24, 0x0138
- 60e:	90 91 39 01 	lds	r25, 0x0139
- 612:	90 93 89 00 	sts	0x0089, r25
- 616:	80 93 88 00 	sts	0x0088, r24
+ 642:	20 91 0e 01 	lds	r18, 0x010E
+ 646:	30 91 0f 01 	lds	r19, 0x010F
+ 64a:	30 93 89 00 	sts	0x0089, r19
+ 64e:	20 93 88 00 	sts	0x0088, r18
    OCR1B= light_val[i][1];
- 61a:	80 91 36 01 	lds	r24, 0x0136
- 61e:	90 91 37 01 	lds	r25, 0x0137
- 622:	90 93 8b 00 	sts	0x008B, r25
- 626:	80 93 8a 00 	sts	0x008A, r24
+ 652:	20 91 0c 01 	lds	r18, 0x010C
+ 656:	30 91 0d 01 	lds	r19, 0x010D
+ 65a:	30 93 8b 00 	sts	0x008B, r19
+ 65e:	20 93 8a 00 	sts	0x008A, r18
    OCR1C= light_val[i][0];
- 62a:	80 91 34 01 	lds	r24, 0x0134
- 62e:	90 91 35 01 	lds	r25, 0x0135
- 632:	90 93 8d 00 	sts	0x008D, r25
- 636:	80 93 8c 00 	sts	0x008C, r24
-
- port_init();
- tcnt_init();
- uart_init();
- light_em_up(7);
- nrf24_init();
- 63a:	0e 94 93 02 	call	0x526	; 0x526 <nrf24_init>
- nrf24_config(21,4); //channel #21, payload length 4
- 63e:	64 e0       	ldi	r22, 0x04	; 4
- 640:	85 e1       	ldi	r24, 0x15	; 21
- 642:	0e 94 78 01 	call	0x2f0	; 0x2f0 <nrf24_config>
-
- nrf24_tx_address(tx_address);
- 646:	85 e0       	ldi	r24, 0x05	; 5
- 648:	91 e0       	ldi	r25, 0x01	; 1
- 64a:	0e 94 7e 02 	call	0x4fc	; 0x4fc <nrf24_tx_address>
- nrf24_rx_address(rx_address);
- 64e:	80 e0       	ldi	r24, 0x00	; 0
- 650:	91 e0       	ldi	r25, 0x01	; 1
- 652:	0e 94 76 02 	call	0x4ec	; 0x4ec <nrf24_rx_address>
-
- uint8_t light, track, snow; //for uart
-
- while(1){ //serial forever
-
-  while(uart_getc() != 0xFF){} //wait for start byte
- 656:	0e 94 d9 02 	call	0x5b2	; 0x5b2 <uart_getc>
- 65a:	c8 2f       	mov	r28, r24
- 65c:	8f 3f       	cpi	r24, 0xFF	; 255
- 65e:	d9 f7       	brne	.-10     	; 0x656 <main+0x6c>
+ 662:	20 91 0a 01 	lds	r18, 0x010A
+ 666:	30 91 0b 01 	lds	r19, 0x010B
+ 66a:	30 93 8d 00 	sts	0x008D, r19
+ 66e:	20 93 8c 00 	sts	0x008C, r18
+  start = uart_getc();//wait for start byte
   light = uart_getc();
- 660:	0e 94 d9 02 	call	0x5b2	; 0x5b2 <uart_getc>
- 664:	18 2f       	mov	r17, r24
+  if(light == 5){light_em_up(BLUE);}
+  if(light == 6){light_em_up(YELLOW);}
+  if(light == 7){light_em_up(RED);}
   track = uart_getc();
- 666:	0e 94 d9 02 	call	0x5b2	; 0x5b2 <uart_getc>
- 66a:	d8 2f       	mov	r29, r24
+ 672:	0e 94 d9 02 	call	0x5b2	; 0x5b2 <uart_getc>
+ 676:	18 2f       	mov	r17, r24
   snow = uart_getc();
- 66c:	0e 94 d9 02 	call	0x5b2	; 0x5b2 <uart_getc>
+ 678:	0e 94 d9 02 	call	0x5b2	; 0x5b2 <uart_getc>
 
 	//*****************************
         // Radio Operation
         /* Fill the data buffer */
         data_array[0] = 0xFF;
- 670:	c0 93 3c 01 	sts	0x013C, r28
+ 67c:	c0 93 3c 01 	sts	0x013C, r28
         data_array[1] = light;
- 674:	10 93 3d 01 	sts	0x013D, r17
+ 680:	d0 93 3d 01 	sts	0x013D, r29
         data_array[2] = track;
- 678:	d0 93 3e 01 	sts	0x013E, r29
-        data_array[3] = snow;                                    
- 67c:	80 93 3f 01 	sts	0x013F, r24
-
+ 684:	10 93 3e 01 	sts	0x013E, r17
+        data_array[3] = snow;
+ 688:	80 93 3f 01 	sts	0x013F, r24
  /* Automatically goes to TX mode */
         nrf24_send(data_array);        
- 680:	8c e3       	ldi	r24, 0x3C	; 60
- 682:	91 e0       	ldi	r25, 0x01	; 1
- 684:	0e 94 b9 01 	call	0x372	; 0x372 <nrf24_send>
+ 68c:	8c e3       	ldi	r24, 0x3C	; 60
+ 68e:	91 e0       	ldi	r25, 0x01	; 1
+ 690:	0e 94 b9 01 	call	0x372	; 0x372 <nrf24_send>
         
         /* Wait for transmission to end */
         while(nrf24_isSending());
- 688:	0e 94 fa 00 	call	0x1f4	; 0x1f4 <nrf24_isSending>
- 68c:	81 11       	cpse	r24, r1
- 68e:	fc cf       	rjmp	.-8      	; 0x688 <main+0x9e>
+ 694:	0e 94 fa 00 	call	0x1f4	; 0x1f4 <nrf24_isSending>
+ 698:	81 11       	cpse	r24, r1
+ 69a:	fc cf       	rjmp	.-8      	; 0x694 <main+0xaa>
         
         /* Make analysis on last tranmission attempt */
         temp = nrf24_lastMessageStatus();	      
- 690:	0e 94 02 01 	call	0x204	; 0x204 <nrf24_lastMessageStatus>
- 694:	80 93 3b 01 	sts	0x013B, r24
+ 69c:	0e 94 02 01 	call	0x204	; 0x204 <nrf24_lastMessageStatus>
+ 6a0:	80 93 3b 01 	sts	0x013B, r24
         
         if(temp == NRF24_TRANSMISSON_OK)
- 698:	88 23       	and	r24, r24
- 69a:	e1 f0       	breq	.+56     	; 0x6d4 <main+0xea>
+ 6a4:	88 23       	and	r24, r24
+ 6a6:	71 f1       	breq	.+92     	; 0x704 <main+0x11a>
         {                    
             uart_putc('O'); //O for ok
         }
         else if(temp == NRF24_MESSAGE_LOST)
- 69c:	81 30       	cpi	r24, 0x01	; 1
- 69e:	19 f1       	breq	.+70     	; 0x6e6 <main+0xfc>
-        {                    
+ 6a8:	81 30       	cpi	r24, 0x01	; 1
+ 6aa:	09 f4       	brne	.+2      	; 0x6ae <main+0xc4>
+ 6ac:	48 c0       	rjmp	.+144    	; 0x73e <main+0x154>
             uart_putc('L'); //L for lost
         }
-        else{uart_putc('N');} //N for no response
- 6a0:	8e e4       	ldi	r24, 0x4E	; 78
- 6a2:	0e 94 c3 02 	call	0x586	; 0x586 <uart_putc>
+       // else{uart_putc('N');} //N for no response
 
 		/* Retranmission count indicates the tranmission quality */
 		temp = nrf24_retransmissionCount();
- 6a6:	0e 94 3b 02 	call	0x476	; 0x476 <nrf24_retransmissionCount>
- 6aa:	80 93 3b 01 	sts	0x013B, r24
-      uart_putc(temp); //send the quality
- 6ae:	0e 94 c3 02 	call	0x586	; 0x586 <uart_putc>
-
-      nrf24_powerUpRx();
- 6b2:	0e 94 67 01 	call	0x2ce	; 0x2ce <nrf24_powerUpRx>
-   
-      if(nrf24_dataReady()){nrf24_getData(data_array);} //loads data array
- 6b6:	0e 94 1f 02 	call	0x43e	; 0x43e <nrf24_dataReady>
- 6ba:	81 11       	cpse	r24, r1
- 6bc:	0f c0       	rjmp	.+30     	; 0x6dc <main+0xf2>
-
-     //check if correct data came back
-     snow = data_array[3];
-     uart_putc(snow);
- 6be:	80 91 3f 01 	lds	r24, 0x013F
- 6c2:	0e 94 c3 02 	call	0x586	; 0x586 <uart_putc>
+ 6ae:	0e 94 3b 02 	call	0x476	; 0x476 <nrf24_retransmissionCount>
+ 6b2:	80 93 3b 01 	sts	0x013B, r24
 	#else
 		//round up by default
 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
 	#endif
 
 	__builtin_avr_delay_cycles(__ticks_dc);
- 6c6:	87 ea       	ldi	r24, 0xA7	; 167
- 6c8:	91 e6       	ldi	r25, 0x61	; 97
- 6ca:	01 97       	sbiw	r24, 0x01	; 1
- 6cc:	f1 f7       	brne	.-4      	; 0x6ca <main+0xe0>
- 6ce:	00 c0       	rjmp	.+0      	; 0x6d0 <main+0xe6>
- 6d0:	00 00       	nop
- 6d2:	c1 cf       	rjmp	.-126    	; 0x656 <main+0x6c>
+ 6b6:	87 ea       	ldi	r24, 0xA7	; 167
+ 6b8:	91 e6       	ldi	r25, 0x61	; 97
+ 6ba:	01 97       	sbiw	r24, 0x01	; 1
+ 6bc:	f1 f7       	brne	.-4      	; 0x6ba <main+0xd0>
+ 6be:	00 c0       	rjmp	.+0      	; 0x6c0 <main+0xd6>
+ 6c0:	00 00       	nop
+
+ uint8_t start,light, track, snow; //for uart
+
+ while(1){ //serial forever
+
+  start = uart_getc();//wait for start byte
+ 6c2:	0e 94 d9 02 	call	0x5b2	; 0x5b2 <uart_getc>
+  light = uart_getc();
+ 6c6:	0e 94 d9 02 	call	0x5b2	; 0x5b2 <uart_getc>
+ 6ca:	d8 2f       	mov	r29, r24
+  if(light == 5){light_em_up(BLUE);}
+ 6cc:	85 30       	cpi	r24, 0x05	; 5
+ 6ce:	09 f0       	breq	.+2      	; 0x6d2 <main+0xe8>
+ 6d0:	b3 cf       	rjmp	.-154    	; 0x638 <main+0x4e>
+}
+//*****************************
+
+//Assigns PWM bottom to vary wavelength
+void light_em_up(uint8_t i){
+   OCR1A= light_val[i][2]; 
+ 6d2:	20 91 20 01 	lds	r18, 0x0120
+ 6d6:	30 91 21 01 	lds	r19, 0x0121
+ 6da:	30 93 89 00 	sts	0x0089, r19
+ 6de:	20 93 88 00 	sts	0x0088, r18
+   OCR1B= light_val[i][1];
+ 6e2:	20 91 1e 01 	lds	r18, 0x011E
+ 6e6:	30 91 1f 01 	lds	r19, 0x011F
+ 6ea:	30 93 8b 00 	sts	0x008B, r19
+ 6ee:	20 93 8a 00 	sts	0x008A, r18
+   OCR1C= light_val[i][0];
+ 6f2:	20 91 1c 01 	lds	r18, 0x011C
+ 6f6:	30 91 1d 01 	lds	r19, 0x011D
+ 6fa:	30 93 8d 00 	sts	0x008D, r19
+ 6fe:	20 93 8c 00 	sts	0x008C, r18
+ 702:	b7 cf       	rjmp	.-146    	; 0x672 <main+0x88>
         /* Make analysis on last tranmission attempt */
         temp = nrf24_lastMessageStatus();	      
         
         if(temp == NRF24_TRANSMISSON_OK)
         {                    
             uart_putc('O'); //O for ok
- 6d4:	8f e4       	ldi	r24, 0x4F	; 79
- 6d6:	0e 94 c3 02 	call	0x586	; 0x586 <uart_putc>
- 6da:	e5 cf       	rjmp	.-54     	; 0x6a6 <main+0xbc>
-		temp = nrf24_retransmissionCount();
-      uart_putc(temp); //send the quality
+ 704:	8f e4       	ldi	r24, 0x4F	; 79
+ 706:	0e 94 c3 02 	call	0x586	; 0x586 <uart_putc>
+ 70a:	d1 cf       	rjmp	.-94     	; 0x6ae <main+0xc4>
+}
+//*****************************
 
-      nrf24_powerUpRx();
-   
-      if(nrf24_dataReady()){nrf24_getData(data_array);} //loads data array
- 6dc:	8c e3       	ldi	r24, 0x3C	; 60
- 6de:	91 e0       	ldi	r25, 0x01	; 1
- 6e0:	0e 94 52 01 	call	0x2a4	; 0x2a4 <nrf24_getData>
- 6e4:	ec cf       	rjmp	.-40     	; 0x6be <main+0xd4>
+//Assigns PWM bottom to vary wavelength
+void light_em_up(uint8_t i){
+   OCR1A= light_val[i][2]; 
+ 70c:	20 91 14 01 	lds	r18, 0x0114
+ 710:	30 91 15 01 	lds	r19, 0x0115
+ 714:	30 93 89 00 	sts	0x0089, r19
+ 718:	20 93 88 00 	sts	0x0088, r18
+   OCR1B= light_val[i][1];
+ 71c:	20 91 12 01 	lds	r18, 0x0112
+ 720:	30 91 13 01 	lds	r19, 0x0113
+ 724:	30 93 8b 00 	sts	0x008B, r19
+ 728:	20 93 8a 00 	sts	0x008A, r18
+   OCR1C= light_val[i][0];
+ 72c:	20 91 10 01 	lds	r18, 0x0110
+ 730:	30 91 11 01 	lds	r19, 0x0111
+ 734:	30 93 8d 00 	sts	0x008D, r19
+ 738:	20 93 8c 00 	sts	0x008C, r18
+ 73c:	9a cf       	rjmp	.-204    	; 0x672 <main+0x88>
         {                    
             uart_putc('O'); //O for ok
         }
         else if(temp == NRF24_MESSAGE_LOST)
         {                    
             uart_putc('L'); //L for lost
- 6e6:	8c e4       	ldi	r24, 0x4C	; 76
- 6e8:	0e 94 c3 02 	call	0x586	; 0x586 <uart_putc>
- 6ec:	dc cf       	rjmp	.-72     	; 0x6a6 <main+0xbc>
+ 73e:	8c e4       	ldi	r24, 0x4C	; 76
+ 740:	0e 94 c3 02 	call	0x586	; 0x586 <uart_putc>
+ 744:	b4 cf       	rjmp	.-152    	; 0x6ae <main+0xc4>
 
-000006ee <_exit>:
- 6ee:	f8 94       	cli
+00000746 <_exit>:
+ 746:	f8 94       	cli
 
-000006f0 <__stop_program>:
- 6f0:	ff cf       	rjmp	.-2      	; 0x6f0 <__stop_program>
+00000748 <__stop_program>:
+ 748:	ff cf       	rjmp	.-2      	; 0x748 <__stop_program>

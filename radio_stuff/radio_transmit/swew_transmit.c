@@ -71,19 +71,22 @@ int main(void){
  port_init();
  tcnt_init();
  uart_init();
- light_em_up(7);
+ //light_em_up(7);
  nrf24_init();
  nrf24_config(21,4); //channel #21, payload length 4
 
  nrf24_tx_address(tx_address);
  nrf24_rx_address(rx_address);
 
- uint8_t light, track, snow; //for uart
+ uint8_t start,light, track, snow; //for uart
 
  while(1){ //serial forever
 
-  while(uart_getc() != 0xFF){} //wait for start byte
+  start = uart_getc();//wait for start byte
   light = uart_getc();
+  if(light == 5){light_em_up(BLUE);}
+  if(light == 6){light_em_up(YELLOW);}
+  if(light == 7){light_em_up(RED);}
   track = uart_getc();
   snow = uart_getc();
 
@@ -93,8 +96,7 @@ int main(void){
         data_array[0] = 0xFF;
         data_array[1] = light;
         data_array[2] = track;
-        data_array[3] = snow;                                    
-
+        data_array[3] = snow;
  /* Automatically goes to TX mode */
         nrf24_send(data_array);        
         
@@ -112,19 +114,19 @@ int main(void){
         {                    
             uart_putc('L'); //L for lost
         }
-        else{uart_putc('N');} //N for no response
+       // else{uart_putc('N');} //N for no response
 
 		/* Retranmission count indicates the tranmission quality */
 		temp = nrf24_retransmissionCount();
-      uart_putc(temp); //send the quality
-
+     // uart_putc(temp); //send the quality
+/*
       nrf24_powerUpRx();
    
       if(nrf24_dataReady()){nrf24_getData(data_array);} //loads data array
 
      //check if correct data came back
      snow = data_array[3];
-     uart_putc(snow);
+     uart_putc(snow); */
      _delay_ms(100); //wait a little while before repeat
 
  }//while

@@ -68,17 +68,14 @@ void latch(uint8_t light_pin){
 // for testing
 void light_test_routine(void){
 
- uint8_t l = 5;
  uint16_t i, ii; 
 
- for(ii=0; ii<6; ii++){
-  l++; 
+ for(ii=5; ii<8; ii++){
   for(i=0;i<250; i++){
-   PORTD |= (1<<l);
+   PORTD |= (1<<ii);
    _delay_ms(2);
    PORTD = 0;
   }
-  if(l>6){l = 4;};
  }//for
 }//light routine
 //*****************************
@@ -89,6 +86,7 @@ void light_test_routine(void){
 int main()
 {
     CPU_PRESCALE(CPU_8MHz);
+    port_init();
     /* init hardware pins */
     nrf24_init();
     
@@ -99,7 +97,6 @@ int main()
     nrf24_tx_address(tx_address);
     nrf24_rx_address(rx_address);
 
-    port_init();
     uart_init();
     mp3_func(CMD_SET_VOLUME, MAX_VOL); 
 
@@ -109,27 +106,30 @@ int main()
         if(nrf24_dataReady()) //loads instructions from UI
         {
             nrf24_getData(data_array); 
+				
+			   if(data_array[0] == 0xFF) //warning system control
+        		{
+				  light_func(data_array[1]);
+				  mp3_func(CMD_PLAY_W_INDEX, data_array[2]);
+             // light_test_routine();
+            }
+		  		if(data_array[3]) //snow check is set
+        		{ 
+			     ADCSRA |= 1<<ADSC; //request value
+			     while (bit_is_clear(ADCSRA, ADIF)){} //shouldn't take long
+			     reading = 168-ADCH; 
+		  	     data_array[3] = reading;
+        		}
         }  
-	     if(data_array[0] == 0xFF) //warning system control
-        {
-				light_func(data_array[1]);
-				mp3_func(CMD_PLAY_W_INDEX, data_array[2]);
-        }
-		  if(data_array[3]) //snow check is set
-        { 
-			  ADCSRA |= 1<<ADSC; //request value
-			  while (bit_is_clear(ADCSRA, ADIF)){} //shouldn't take long
-			  reading = 168-ADCH; 
-		  	  data_array[3] = reading;
-        }
+
         	//*****************************
         // Radio Operation - send snow data back
 		 /* Automatically goes to TX mode */
-			  nrf24_send(data_array);        
+		//	  nrf24_send(data_array);        
 				  
 		 /* Wait for transmission to end */
-	 		  while(nrf24_isSending());
-			  _delay_ms(500); //wait a little while longer before repeat
+	 	//	  while(nrf24_isSending());
+		//	  _delay_ms(500); //wait a little while longer before repeat
     }
 }
 /* ------------------------------------------------------------------------- */
