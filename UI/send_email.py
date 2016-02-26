@@ -9,4 +9,3 @@ server.starttls()
 server.login(username,password)
 server.sendmail(fromaddr, toaddrs, msg)
 server.quit()
-fuck you
