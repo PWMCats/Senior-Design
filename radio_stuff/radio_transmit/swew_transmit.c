@@ -20,7 +20,7 @@
 #include <util/delay.h>
 #include "./nrf24L01_plus-master/nrf24.h" //AVRfreaks nrf 
 #include "../uart.h" // Uses Spencer Kresge's uart_funtions
-
+#include "../swew.h" //general purpose header
 /* nrf variables ------------------------------------------------------------------------- */
 uint8_t temp;
 uint8_t q = 0;

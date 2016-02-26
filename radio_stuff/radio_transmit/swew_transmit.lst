@@ -11,9 +11,9 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
   3 .stab         0000270c  00000000  00000000  000007c0  2**2
                   CONTENTS, READONLY, DEBUGGING
-  4 .stabstr      00001354  00000000  00000000  00002ecc  2**0
+  4 .stabstr      00001399  00000000  00000000  00002ecc  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .comment      00000011  00000000  00000000  00004220  2**0
+  5 .comment      00000011  00000000  00000000  00004265  2**0
                   CONTENTS, READONLY
 
 Disassembly of section .text:
@@ -172,8 +172,8 @@ void light_em_up(uint8_t i){
  134:	f9 1f       	adc	r31, r25
  136:	ee 0f       	add	r30, r30
  138:	ff 1f       	adc	r31, r31
- 13a:	e0 50       	subi	r30, 0x00	; 0
- 13c:	ff 4f       	sbci	r31, 0xFF	; 255
+ 13a:	e6 5f       	subi	r30, 0xF6	; 246
+ 13c:	fe 4f       	sbci	r31, 0xFE	; 254
  13e:	84 81       	ldd	r24, Z+4	; 0x04
  140:	95 81       	ldd	r25, Z+5	; 0x05
  142:	90 93 89 00 	sts	0x0089, r25
@@ -1500,18 +1500,18 @@ int main(void){
 //Assigns PWM bottom to vary wavelength
 void light_em_up(uint8_t i){
    OCR1A= light_val[i][2]; 
- 60a:	80 91 2e 01 	lds	r24, 0x012E
- 60e:	90 91 2f 01 	lds	r25, 0x012F
+ 60a:	80 91 38 01 	lds	r24, 0x0138
+ 60e:	90 91 39 01 	lds	r25, 0x0139
  612:	90 93 89 00 	sts	0x0089, r25
  616:	80 93 88 00 	sts	0x0088, r24
    OCR1B= light_val[i][1];
- 61a:	80 91 2c 01 	lds	r24, 0x012C
- 61e:	90 91 2d 01 	lds	r25, 0x012D
+ 61a:	80 91 36 01 	lds	r24, 0x0136
+ 61e:	90 91 37 01 	lds	r25, 0x0137
  622:	90 93 8b 00 	sts	0x008B, r25
  626:	80 93 8a 00 	sts	0x008A, r24
    OCR1C= light_val[i][0];
- 62a:	80 91 2a 01 	lds	r24, 0x012A
- 62e:	90 91 2b 01 	lds	r25, 0x012B
+ 62a:	80 91 34 01 	lds	r24, 0x0134
+ 62e:	90 91 35 01 	lds	r25, 0x0135
  632:	90 93 8d 00 	sts	0x008D, r25
  636:	80 93 8c 00 	sts	0x008C, r24
 
@@ -1527,11 +1527,11 @@ void light_em_up(uint8_t i){
  642:	0e 94 78 01 	call	0x2f0	; 0x2f0 <nrf24_config>
 
  nrf24_tx_address(tx_address);
- 646:	85 e3       	ldi	r24, 0x35	; 53
+ 646:	85 e0       	ldi	r24, 0x05	; 5
  648:	91 e0       	ldi	r25, 0x01	; 1
  64a:	0e 94 7e 02 	call	0x4fc	; 0x4fc <nrf24_tx_address>
  nrf24_rx_address(rx_address);
- 64e:	80 e3       	ldi	r24, 0x30	; 48
+ 64e:	80 e0       	ldi	r24, 0x00	; 0
  650:	91 e0       	ldi	r25, 0x01	; 1
  652:	0e 94 76 02 	call	0x4ec	; 0x4ec <nrf24_rx_address>
 

@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <util/delay.h>
 #include "./nrf24L01_plus-master/nrf24.h" //AVRfreaks nrf 
-#include"../uart.h" // Uses Spencer Kresge's uart_funtions
+#include "../uart.h" // Uses Spencer Kresge's uart_funtions
 
 /* nrf variables ------------------------------------------------------------------------- */
 uint8_t temp;
@@ -28,17 +28,6 @@ uint8_t data_array[4];
 uint8_t tx_address[5] = {0xE7,0xE7,0xE7,0xE7,0xE7};
 uint8_t rx_address[5] = {0xD7,0xD7,0xD7,0xD7,0xD7};
 /* ------------------------------------------------------------------------- */
-//Trevor Love's RGB Lookup Table
-                                //   R     G     B
-    uint16_t light_val[8][3] ={  {3000,    0,    0}, //red 
-                                 {4000,  600,    0}, //yellow
-                                 {   0, 3000,    0}, //green
-                                 {   0,    0, 3000}, //blue
-                                 {1000,    0, 3000}, //purple
-                                 {2000,  200,  300},  //pink 
-                                 {2000,  100,    0}, //orange
-                                 {   0,    0,    0}  }; 
-//*****************************
 
 
 //*****************************

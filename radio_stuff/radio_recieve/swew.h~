@@ -1,7 +1,5 @@
 //swew.h
 // general purpose header file for macros and constants
-#ifndef SWEW_H_
-#define SWEW_H_
 
 //slow down clock for low-voltage performance 
 #define CPU_PRESCALE(n) (CLKPR = 0x80, CLKPR = (n))
@@ -54,6 +52,6 @@
 
 //functions
 void light_func(uint8_t state);
-void mp3_func(uint8_t cmd, uint8_t dat);
+void mp3_func(uint8_t dat);
 
-#endif
+
