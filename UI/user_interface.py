@@ -1,12 +1,38 @@
 import imaplib
 import email
 import re
+import urllib2
+import json
 import sys
 from PyQt4 import QtGui, QtCore
 
 #Temporary send function to print message
 def send(logic_code):
 	print logic_code
+	
+#Gather Weather Data From WunderGround and return wind speed
+def gather_wind():
+	f = urllib2.urlopen('http://api.wunderground.com/api/0def10027afaebb7/conditions/q/WA/EVERETT.json')
+	json_string = f.read()
+	parsed_json = json.loads(json_string)
+	wind_speed = parsed_json['current_observation']['wind_mph']
+	return float(wind_speed)
+	
+#Gather Weather Data From WunderGround and return Temp in F
+def gather_temp():
+	f = urllib2.urlopen('http://api.wunderground.com/api/0def10027afaebb7/conditions/q/WA/EVERETT.json')
+	json_string = f.read()
+	parsed_json = json.loads(json_string)
+	temp_f = parsed_json['current_observation']['temp_f']
+	return float(temp_f)
+
+#Gather Weather Data From WunderGround and return wind direction
+def gather_direction():
+	f = urllib2.urlopen('http://api.wunderground.com/api/0def10027afaebb7/conditions/q/WA/EVERETT.json')
+	json_string = f.read()
+	parsed_json = json.loads(json_string)
+	direction = parsed_json['current_observation']['wind_dir']
+	return str(direction)
 
 #This function checks for the most recent email in the inbox and 
 #turns on the corresponding light and siren. 
@@ -207,22 +233,44 @@ class Example(QtGui.QWidget):
         self.lbl.move(202, 155)  
         
         #Temp Display
+        temp = gather_temp()
         self.lbl = QtGui.QLabel("Current Temperature:", self)
         self.lbl.move(0, 405)
-        temp = QtGui.QLCDNumber(self)
-        temp.move(125, 400)
+        
+        self.lbl = QtGui.QLabel("%s\xb0F" %temp, self)
+        newfont = QtGui.QFont("Times", 14, QtGui.QFont.Bold)
+        self.lbl.setFont(newfont)
+        self.lbl.move(125, 405)
+        
+        #Aural Display
+        self.lbl = QtGui.QLabel("Aural:", self)
+        self.lbl.move(0, 375)
+        
+        self.lbl = QtGui.QLabel("No Alert", self)
+        newfont = QtGui.QFont("Times", 14, QtGui.QFont.Bold)
+        self.lbl.setFont(newfont)
+        self.lbl.move(40, 375)
+        
         
         #Wind Speed Display
-        wind = QtGui.QLCDNumber(self)
+        wind = gather_wind()
+        direction = gather_direction()
         self.lbl = QtGui.QLabel("Current Wind Speed:", self)
         self.lbl.move(0, 430)
-        wind.move(125, 425)
+        
+        self.lbl = QtGui.QLabel("%s mph %s" %(wind, direction), self)
+        newfont = QtGui.QFont("Times", 14, QtGui.QFont.Bold)
+        self.lbl.setFont(newfont)
+        self.lbl.move(125, 430)       
         
         #Snowfall Height
-        snow = QtGui.QLCDNumber(self)
         self.lbl = QtGui.QLabel("Current Snow Pack:", self)
-        self.lbl.move(0, 455)
-        snow.move(125, 450)
+        self.lbl.move(0, 450)
+        
+        self.lbl = QtGui.QLabel("0 in", self)
+        newfont = QtGui.QFont("Times", 14, QtGui.QFont.Bold)
+        self.lbl.setFont(newfont)
+        self.lbl.move(125, 450)  
         
         #Labels
         #Manual Input
@@ -239,10 +287,6 @@ class Example(QtGui.QWidget):
         #Lights
         self.lbl = QtGui.QLabel("Light:", self)
         self.lbl.move(0, 350)
-        
-        #Aural
-        self.lbl = QtGui.QLabel("Aural:", self)
-        self.lbl.move(0, 375)
         
         #Duration
         self.lbl = QtGui.QLabel("Duration", self)
@@ -261,13 +305,13 @@ class Example(QtGui.QWidget):
         self.square.setStyleSheet("QWidget { background-color: %s }" %  
         self.col.name())
         
-        #Communication Status
+        #Communication Status Indicator
         self.col = QtGui.QColor(0, 255, 0)
         self.square = QtGui.QFrame(self)
         self.square.setGeometry(140, 475, 50, 15)
         self.square.setStyleSheet("QWidget { background-color: %s }" %  
         self.col.name())
-                
+        
     	#Activate Window
         self.setGeometry(150, 290, 400, 600)
         self.setWindowTitle('Severe Weather Warning System User Interface')
@@ -275,7 +319,7 @@ class Example(QtGui.QWidget):
         
         
 #Set up the window with all of the widgets
-def GUI_window():
+def main():
 	app = QtGui.QApplication(sys.argv)
 	ex = Example()
 	sys.exit(app.exec_())
@@ -286,5 +330,5 @@ message = 'initial'
 while 1:
 	#previous_message = message
 	#message = handle_email(previous_message)
-	GUI_window()
-	
+	if __name__ == '__main__':
+		main()
