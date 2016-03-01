@@ -95,22 +95,28 @@ def handle_email(previous_message):
 
 #GUI window formatting
 class Example(QtGui.QWidget):
-    
     def __init__(self):
         super(Example, self).__init__()
         
         self.initUI()   
-		 
+		     	
+
     def initUI(self):
-    	
-        #Button
+	
+		#Button
         QtGui.QToolTip.setFont(QtGui.QFont('SansSerif', 10))
         
         activate = QtGui.QPushButton('Send Alert', self)
         activate.setToolTip('This activates the set alerts')
         activate.resize(activate.sizeHint())
         activate.move(125, 225)
-        
+        activate.clicked.connect(self.clicked_button(light_selection, aural_selection, hours, minutes))
+        #Alert Signals
+        light_selection = "No Light"
+        aural_selection = "No Alert"
+        hours = "0"
+        minutes = "0"
+		
         #Visual Dropdown Menu
         self.lbl = QtGui.QLabel("Visual Alerts", self)
         visual = QtGui.QComboBox(self)
@@ -140,6 +146,7 @@ class Example(QtGui.QWidget):
         
         aural.move(200, 75)
         self.lbl.move(202, 55)
+		self.aural.currentIndexChanged.connect(self.auralchanged)
         
         #Set Duration
         #Hour Dropdown Menu
@@ -247,81 +254,81 @@ class Example(QtGui.QWidget):
         
         #Temp Display
         temp = gather_temp()
-        self.lbl = QtGui.QLabel("Current Temperature:", self)
-        self.lbl.move(0, 405)
+        self.temp_lbl = QtGui.QLabel("Current Temperature:", self)
+        self.temp_lbl.move(0, 400)
         
         self.temperature = QtGui.QLabel("%s\xb0F" %temp, self)
         newfont = QtGui.QFont("Times", 14, QtGui.QFont.Bold)
         self.temperature.setFont(newfont)
-        self.temperature.move(125, 405)
+        self.temperature.move(147, 398)
         
         #Aural Display
-        self.lbl = QtGui.QLabel("Aural:", self)
-        self.lbl.move(0, 375)
+        self.aural_lbl = QtGui.QLabel("Aural:", self)
+        self.aural_lbl.move(0, 375)
         
         self.aural_alert = QtGui.QLabel("No Alert", self)
         newfont = QtGui.QFont("Times", 14, QtGui.QFont.Bold)
         self.aural_alert.setFont(newfont)
-        self.aural_alert.move(40, 375)
+        self.aural_alert.move(45, 372)
         
         
         #Wind Speed Display
         wind = gather_wind()
         direction = gather_direction()
-        self.lbl = QtGui.QLabel("Current Wind Speed:", self)
-        self.lbl.move(0, 430)
+        self.wind_lbl = QtGui.QLabel("Current Wind Speed:", self)
+        self.wind_lbl.move(0, 430)
         
         self.wind_speed = QtGui.QLabel("%s mph %s" %(wind, direction), self)
         newfont = QtGui.QFont("Times", 14, QtGui.QFont.Bold)
         self.wind_speed.setFont(newfont)
-        self.wind_speed.move(125, 430)       
+        self.wind_speed.move(140, 426)       
         
         #Snowfall Height
-        self.lbl = QtGui.QLabel("Current Snow Pack:", self)
-        self.lbl.move(0, 450)
+        self.snow_lbl = QtGui.QLabel("Current Snow Pack:", self)
+        self.snow_lbl.move(0, 450)
         
         self.snow = QtGui.QLabel("0 in", self)
         newfont = QtGui.QFont("Times", 14, QtGui.QFont.Bold)
         self.snow.setFont(newfont)
-        self.snow.move(125, 450)  
+        self.snow.move(132, 447)  
         
         #Labels
         #Manual Input
-        self.lbl = QtGui.QLabel("Manual Inputs", self)
+        self.manual_lbl = QtGui.QLabel("Manual Inputs", self)
         newfont = QtGui.QFont("Times", 30, QtGui.QFont.Bold) 
-        self.lbl.setFont(newfont)
+        self.manual_lbl.setFont(newfont)
         
         #Current Conditions
-        self.lbl = QtGui.QLabel("Current Conditions", self)
+        self.current_lbl = QtGui.QLabel("Current Conditions", self)
         newfont = QtGui.QFont("Times", 30, QtGui.QFont.Bold)
-        self.lbl.setFont(newfont)
-        self.lbl.move(0, 300)
+        self.current_lbl.setFont(newfont)
+        self.current_lbl.move(0, 300)
         
         #Lights
-        self.lbl = QtGui.QLabel("Light:", self)
-        self.lbl.move(0, 350)
+        self.light_lbl = QtGui.QLabel("Light:", self)
+        self.light_lbl.move(0, 350)
         
         #Duration
-        self.lbl = QtGui.QLabel("Duration", self)
-        self.lbl.move(150, 125)
+        self.duration_lbl = QtGui.QLabel("Duration", self)
+        self.duration_lbl.move(150, 125)
         newfont = QtGui.QFont("Times", 14, QtGui.QFont.Bold)
-        self.lbl.setFont(newfont)
+        self.duration_lbl.setFont(newfont)
         
         #Communication Status
-        self.lbl = QtGui.QLabel("Communication Status:", self)
-        self.lbl.move(0, 475)
+        self.comm_lbl = QtGui.QLabel("Communication Status:", self)
+        self.comm_lbl.move(0, 475)
         
         #Light Color
         self.light_col = QtGui.QColor(0, 0, 255)
         self.square = QtGui.QFrame(self)
-        self.square.setGeometry(35, 350, 50, 15)
+        self.square.setGeometry(43, 350, 50, 15)
         self.square.setStyleSheet("QWidget { background-color: %s }" %  
         self.light_col.name())
         
         #Communication Status Indicator
         self.comm_col = QtGui.QColor(0, 255, 0)
         self.square = QtGui.QFrame(self)
-        self.square.setGeometry(140, 475, 50, 15)
+        self.square.setGeometry(155, 477, 50, 15)
         self.square.setStyleSheet("QWidget { background-color: %s }" %  
         self.comm_col.name())
         
@@ -330,8 +337,98 @@ class Example(QtGui.QWidget):
         self.setWindowTitle('Severe Weather Warning System User Interface')
         self.show()
         
+	def clicked_button(self, light_selection, aural_selection, hours, minutes):
+		if light_selection == "No Light":
+			if aural_selection == "No Alert"
+				send("0a0")
+			elif aural_selection == "Lightning1":
+				send("0b0")
+			elif aural_selection == "Lightning2":
+				send("0c0")
+			elif aural_selection == "Lightning3":
+				send("0d0")
+			elif aural_selection == "Wind1":
+				send("0e0")
+			elif aural_selection == "Wind2":
+				send("0f0")
+			elif aural_selection == "Wind3":
+				send("0g0")
+			elif aural_selection == "Shelter":
+				send("0h0")
+			elif aural_selection == "Fuck":
+				send("0i0")
+			elif aural_selection == "Shit":
+				send("0j0")
+		elif light_selection == "Red":
+			if aural_selection == "No Alert"
+				send("Ra0")
+			elif aural_selection == "Lightning1":
+				send("Rb0")
+			elif aural_selection == "Lightning2":
+				send("Rc0")
+			elif aural_selection == "Lightning3":
+				send("Rd0")
+			elif aural_selection == "Wind1":
+				send("Re0")
+			elif aural_selection == "Wind2":
+				send("Rf0")
+			elif aural_selection == "Wind3":
+				send("Rg0")
+			elif aural_selection == "Shelter":
+				send("Rh0")
+			elif aural_selection == "Fuck":
+				send("Ri0")
+			elif aural_selection == "Shit":
+				send("Rj0")
+		elif light_selection == "Yellow":
+			if aural_selection == "No Alert"
+				send("Ya0")
+			elif aural_selection == "Lightning1":
+				send("Yb0")
+			elif aural_selection == "Lightning2":
+				send("Yc0")
+			elif aural_selection == "Lightning3":
+				send("Yd0")
+			elif aural_selection == "Wind1":
+				send("Ye0")
+			elif aural_selection == "Wind2":
+				send("Yf0")
+			elif aural_selection == "Wind3":
+				send("Yg0")
+			elif aural_selection == "Shelter":
+				send("Yh0")
+			elif aural_selection == "Fuck":
+				send("Yi0")
+			elif aural_selection == "Shit":
+				send("Yj0")
+		elif light_selection == "Blue":
+			if aural_selection == "No Alert"
+				send("Ba0")
+			elif aural_selection == "Lightning1":
+				send("Bb0")
+			elif aural_selection == "Lightning2":
+				send("Bc0")
+			elif aural_selection == "Lightning3":
+				send("Bd0")
+			elif aural_selection == "Wind1":
+				send("Be0")
+			elif aural_selection == "Wind2":
+				send("Bf0")
+			elif aural_selection == "Wind3":
+				send("Bg0")
+			elif aural_selection == "Shelter":
+				send("Bh0")
+			elif aural_selection == "Fuck":
+				send("Bi0")
+			elif aural_selection == "Shit":
+				send("Bj0")
 	
-
+	def visualchanged(self):
+		visual_selection = str(aural.currentText())
+	
+	def auralchanged(self):
+		aural_selection = str(visual.currentText())
+		
 #main Function
 message = 'initial'    
 def main():
