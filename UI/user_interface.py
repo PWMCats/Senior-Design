@@ -6,6 +6,16 @@ import json
 import sys
 from PyQt4 import QtGui, QtCore
 
+#Alert Signals
+global light_selection
+light_selection = "No Light"
+global aural_selection
+aural_selection = "No Alert"
+global hours
+hours = "0"
+global minutes
+minutes = "0"
+
 #Temporary send function to print message
 def send(logic_code):
 	print logic_code
@@ -98,159 +108,156 @@ class Example(QtGui.QWidget):
     def __init__(self):
         super(Example, self).__init__()
         
-        self.initUI()   
-		     	
-
+        self.initUI() 
+    
     def initUI(self):
-	
 		#Button
         QtGui.QToolTip.setFont(QtGui.QFont('SansSerif', 10))
         
-        activate = QtGui.QPushButton('Send Alert', self)
-        activate.setToolTip('This activates the set alerts')
-        activate.resize(activate.sizeHint())
-        activate.move(125, 225)
-        activate.clicked.connect(self.clicked_button(light_selection, aural_selection, hours, minutes))
-        #Alert Signals
-        light_selection = "No Light"
-        aural_selection = "No Alert"
-        hours = "0"
-        minutes = "0"
-		
+        self.activate_button = QtGui.QPushButton('Send Alert', self)
+        self.activate_button.setToolTip('This activates the set alerts')
+        self.activate_button.resize(self.activate_button.sizeHint())
+        self.activate_button.move(125, 225)
+        self.activate_button.clicked.connect(self.clicked_button)
+        
         #Visual Dropdown Menu
         self.lbl = QtGui.QLabel("Visual Alerts", self)
-        visual = QtGui.QComboBox(self)
-        visual.setToolTip('Select the visual alert you want to activate')
-        visual.addItem("No Light")
-        visual.addItem("Red")
-        visual.addItem("Yellow")
-        visual.addItem("Blue")
+        self.visual = QtGui.QComboBox(self)
+        self.visual.setToolTip('Select the visual alert you want to activate')
+        self.visual.addItem("No Light")
+        self.visual.addItem("Red")
+        self.visual.addItem("Yellow")
+        self.visual.addItem("Blue")
         
-        visual.move(50, 75)
+        self.visual.move(50, 75)
         self.lbl.move(52, 55)
+        self.visual.activated[str].connect(self.visualchanged)
         
         #Aural Dropdown Menu
         self.lbl = QtGui.QLabel("Aural Alerts", self)
-        aural = QtGui.QComboBox(self)
-        aural.setToolTip('Select the aural alert you want to activate')
-        aural.addItem("No Alert")
-        aural.addItem("Lightning1")
-        aural.addItem("Lightning2")  
-        aural.addItem("Lightning3")  
-        aural.addItem("Wind1")  
-        aural.addItem("Wind2")  
-        aural.addItem("Wind3")  
-        aural.addItem("Shelter")  
-        aural.addItem("Fuck")  
-        aural.addItem("Shit")
+        self.aural = QtGui.QComboBox(self)
+        self.aural.setToolTip('Select the aural alert you want to activate')
+        self.aural.addItem("No Alert")
+        self.aural.addItem("Lightning1")
+        self.aural.addItem("Lightning2")  
+        self.aural.addItem("Lightning3")  
+        self.aural.addItem("Wind1")  
+        self.aural.addItem("Wind2")  
+        self.aural.addItem("Wind3")  
+        self.aural.addItem("Shelter")  
+        self.aural.addItem("Fuck")  
+        self.aural.addItem("Shit")
         
-        aural.move(200, 75)
+        self.aural.move(200, 75)
         self.lbl.move(202, 55)
-		self.aural.currentIndexChanged.connect(self.auralchanged)
+        self.aural.activated[str].connect(self.auralchanged)
         
         #Set Duration
         #Hour Dropdown Menu
         self.lbl = QtGui.QLabel("Visual Alerts", self)
-        hour = QtGui.QComboBox(self)
-        hour.setToolTip('Select the number of hours for the alert')
-        hour.addItem("Hours")
-        hour.addItem("0")
-        hour.addItem("1")
-        hour.addItem("2")
-        hour.addItem("3")
-        hour.addItem("4")
-        hour.addItem("5")
-        hour.addItem("6")
-        hour.addItem("7")
-        hour.addItem("8")
-        hour.addItem("9")
-        hour.addItem("10")
-        hour.addItem("11")
-        hour.addItem("12")
-        hour.addItem("13")
-        hour.addItem("14")
-        hour.addItem("15")
-        hour.addItem("16")
-        hour.addItem("17")
-        hour.addItem("18")
-        hour.addItem("19")
-        hour.addItem("20")
-        hour.addItem("21")
-        hour.addItem("22")
-        hour.addItem("23")
-        hour.addItem("24")
+        self.hour = QtGui.QComboBox(self)
+        self.hour.setToolTip('Select the number of hours for the alert')
+        self.hour.addItem("Hours")
+        self.hour.addItem("0")
+        self.hour.addItem("1")
+        self.hour.addItem("2")
+        self.hour.addItem("3")
+        self.hour.addItem("4")
+        self.hour.addItem("5")
+        self.hour.addItem("6")
+        self.hour.addItem("7")
+        self.hour.addItem("8")
+        self.hour.addItem("9")
+        self.hour.addItem("10")
+        self.hour.addItem("11")
+        self.hour.addItem("12")
+        self.hour.addItem("13")
+        self.hour.addItem("14")
+        self.hour.addItem("15")
+        self.hour.addItem("16")
+        self.hour.addItem("17")
+        self.hour.addItem("18")
+        self.hour.addItem("19")
+        self.hour.addItem("20")
+        self.hour.addItem("21")
+        self.hour.addItem("22")
+        self.hour.addItem("23")
+        self.hour.addItem("24")
         
-        hour.move(50, 175)
+        self.hour.move(50, 175)
         self.lbl.move(52, 155)
+        self.hour.activated[str].connect(self.hourchanged)
         
         #Aural Dropdown Menu
         self.lbl = QtGui.QLabel("Aural Alerts", self)
-        minute = QtGui.QComboBox(self)
-        minute.setToolTip('Select the number of minutes for the alert')
-        minute.addItem("Minutes")
-        minute.addItem("0")
-        minute.addItem("1")
-        minute.addItem("2")
-        minute.addItem("3")
-        minute.addItem("4")
-        minute.addItem("5")
-        minute.addItem("6")
-        minute.addItem("7")
-        minute.addItem("8")
-        minute.addItem("9")
-        minute.addItem("10")
-        minute.addItem("11")
-        minute.addItem("12")
-        minute.addItem("13")
-        minute.addItem("14")
-        minute.addItem("15")
-        minute.addItem("16")
-        minute.addItem("17")
-        minute.addItem("18")
-        minute.addItem("19")
-        minute.addItem("20")
-        minute.addItem("21")
-        minute.addItem("22")
-        minute.addItem("23")
-        minute.addItem("24")
-        minute.addItem("25")
-        minute.addItem("26")
-        minute.addItem("27")
-        minute.addItem("28")
-        minute.addItem("29")
-        minute.addItem("30")
-        minute.addItem("31")
-        minute.addItem("32")
-        minute.addItem("33")
-        minute.addItem("34")
-        minute.addItem("35")
-        minute.addItem("36")
-        minute.addItem("37")
-        minute.addItem("38")
-        minute.addItem("39")
-        minute.addItem("40")
-        minute.addItem("41")
-        minute.addItem("42")
-        minute.addItem("43")
-        minute.addItem("44")
-        minute.addItem("45")
-        minute.addItem("46")
-        minute.addItem("47")
-        minute.addItem("48")
-        minute.addItem("49")
-        minute.addItem("50")
-        minute.addItem("51")
-        minute.addItem("52")
-        minute.addItem("53")
-        minute.addItem("54")
-        minute.addItem("55")
-        minute.addItem("56")
-        minute.addItem("57")
-        minute.addItem("58")
-        minute.addItem("59")
-        minute.addItem("60")
-        minute.move(200, 175)
-        self.lbl.move(202, 155)  
+        self.minute = QtGui.QComboBox(self)
+        self.minute.setToolTip('Select the number of minutes for the alert')
+        self.minute.addItem("Minutes")
+        self.minute.addItem("0")
+        self.minute.addItem("1")
+        self.minute.addItem("2")
+        self.minute.addItem("3")
+        self.minute.addItem("4")
+        self.minute.addItem("5")
+        self.minute.addItem("6")
+        self.minute.addItem("7")
+        self.minute.addItem("8")
+        self.minute.addItem("9")
+        self.minute.addItem("10")
+        self.minute.addItem("11")
+        self.minute.addItem("12")
+        self.minute.addItem("13")
+        self.minute.addItem("14")
+        self.minute.addItem("15")
+        self.minute.addItem("16")
+        self.minute.addItem("17")
+        self.minute.addItem("18")
+        self.minute.addItem("19")
+        self.minute.addItem("20")
+        self.minute.addItem("21")
+        self.minute.addItem("22")
+        self.minute.addItem("23")
+        self.minute.addItem("24")
+        self.minute.addItem("25")
+        self.minute.addItem("26")
+        self.minute.addItem("27")
+        self.minute.addItem("28")
+        self.minute.addItem("29")
+        self.minute.addItem("30")
+        self.minute.addItem("31")
+        self.minute.addItem("32")
+        self.minute.addItem("33")
+        self.minute.addItem("34")
+        self.minute.addItem("35")
+        self.minute.addItem("36")
+        self.minute.addItem("37")
+        self.minute.addItem("38")
+        self.minute.addItem("39")
+        self.minute.addItem("40")
+        self.minute.addItem("41")
+        self.minute.addItem("42")
+        self.minute.addItem("43")
+        self.minute.addItem("44")
+        self.minute.addItem("45")
+        self.minute.addItem("46")
+        self.minute.addItem("47")
+        self.minute.addItem("48")
+        self.minute.addItem("49")
+        self.minute.addItem("50")
+        self.minute.addItem("51")
+        self.minute.addItem("52")
+        self.minute.addItem("53")
+        self.minute.addItem("54")
+        self.minute.addItem("55")
+        self.minute.addItem("56")
+        self.minute.addItem("57")
+        self.minute.addItem("58")
+        self.minute.addItem("59")
+        self.minute.addItem("60")
+        self.minute.move(200, 175)
+        
+        self.lbl.move(202, 155) 
+        self.minute.activated[str].connect(self.minutechanged) 
         
         #Temp Display
         temp = gather_temp()
@@ -337,9 +344,9 @@ class Example(QtGui.QWidget):
         self.setWindowTitle('Severe Weather Warning System User Interface')
         self.show()
         
-	def clicked_button(self, light_selection, aural_selection, hours, minutes):
+    def clicked_button(self):
 		if light_selection == "No Light":
-			if aural_selection == "No Alert"
+			if aural_selection == "No Alert":
 				send("0a0")
 			elif aural_selection == "Lightning1":
 				send("0b0")
@@ -360,7 +367,7 @@ class Example(QtGui.QWidget):
 			elif aural_selection == "Shit":
 				send("0j0")
 		elif light_selection == "Red":
-			if aural_selection == "No Alert"
+			if aural_selection == "No Alert":
 				send("Ra0")
 			elif aural_selection == "Lightning1":
 				send("Rb0")
@@ -381,7 +388,7 @@ class Example(QtGui.QWidget):
 			elif aural_selection == "Shit":
 				send("Rj0")
 		elif light_selection == "Yellow":
-			if aural_selection == "No Alert"
+			if aural_selection == "No Alert":
 				send("Ya0")
 			elif aural_selection == "Lightning1":
 				send("Yb0")
@@ -402,7 +409,7 @@ class Example(QtGui.QWidget):
 			elif aural_selection == "Shit":
 				send("Yj0")
 		elif light_selection == "Blue":
-			if aural_selection == "No Alert"
+			if aural_selection == "No Alert":
 				send("Ba0")
 			elif aural_selection == "Lightning1":
 				send("Bb0")
@@ -422,13 +429,30 @@ class Example(QtGui.QWidget):
 				send("Bi0")
 			elif aural_selection == "Shit":
 				send("Bj0")
+		global minutes
+		if (int(minutes) > 0) or (int(hours) > 0):
+			self.timer = QtCore.QTimer()
+			self.timer.singleShot((int(hours)*3600000) + (int(minutes)*6000), self.off_signal)
+			
+    def off_signal(self):
+		send("0a0")
+				
+    def visualchanged(self):
+		global visual_selection
+		visual_selection = str(self.visual.currentText())
 	
-	def visualchanged(self):
-		visual_selection = str(aural.currentText())
-	
-	def auralchanged(self):
-		aural_selection = str(visual.currentText())
+    def auralchanged(self):
+		global aural_selection
+		aural_selection = str(self.aural.currentText())
 		
+    def hourchanged(self):
+    	global hours
+    	hours = str(self.hour.currentText())
+    	
+    def minutechanged(self):
+    	global minutes
+    	minutes = str(self.minute.currentText())
+	
 #main Function
 message = 'initial'    
 def main():
