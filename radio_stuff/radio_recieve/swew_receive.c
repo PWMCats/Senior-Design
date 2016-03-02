@@ -87,6 +87,10 @@ int main()
 {
     CPU_PRESCALE(CPU_8MHz);
     port_init();
+    adc_init(); //son of a bitch
+    uart_init();
+    mp3_func(CMD_SET_VOLUME, MAX_VOL); 
+    static uint8_t timeout;
     /* init hardware pins */
     nrf24_init();
     
@@ -97,50 +101,50 @@ int main()
     nrf24_tx_address(tx_address);
     nrf24_rx_address(rx_address);
 
-    uart_init();
-    mp3_func(CMD_SET_VOLUME, MAX_VOL); 
-
    while(1)
    {    
-		  if(playmode==PLAY){q++; if(q>50){playmode = OFF;q=0;}}
-        if(nrf24_dataReady()) //loads instructions from UI
-        {
-            nrf24_getData(data_array); 
-				
-			   if(data_array[0] == 0xFF) //warning system control
-        		{
-				  light_func(data_array[1]);
-				  mp3_func(CMD_PLAY_W_INDEX, data_array[2]);
-             // light_test_routine();
-            }
-		  		if(data_array[3]) //snow check is set
-        		{ 
-			     ADCSRA |= 1<<ADSC; //request value
-			     while (bit_is_clear(ADCSRA, ADIF)){} //shouldn't take long
-			     reading = 168-ADCH; 
-		  	     data_array[3] = reading;
-        		}
-        }  
+        //if(playmode==PLAY){q++; if(q>50){playmode = OFF;q=0;}}
 
+      while(!nrf24_dataReady()){if(timeout>1000){break;} timeout++;} //wait for transmission
+      if(nrf24_dataReady())
+      {
+            nrf24_getData(data_array); 	
+	    if(data_array[0] == 0xFF) //warning system control
+	    {
+	     light_func(data_array[1]);
+	      mp3_func(CMD_PLAY_W_INDEX, data_array[2]);
+              light_test_routine();
+            }
+  	    if(data_array[3]) //snow check is set
+	    { 
+	     ADCSRA |= 1<<ADSC; //request value
+	     while (bit_is_clear(ADCSRA, ADIF)){} //shouldn't take long
+	     reading = ADCH;
+  	     data_array[3] = reading;
+	    }
+        }  
+       
         	//*****************************
         // Radio Operation - send snow data back
-		 /* Automatically goes to TX mode */
-		//	  nrf24_send(data_array);        
-				  
-		 /* Wait for transmission to end */
-	 	//	  while(nrf24_isSending());
-		//	  _delay_ms(500); //wait a little while longer before repeat
-    }
-}
+	 /* Automatically goes to TX mode */
+		  nrf24_send(data_array);        
+			  
+	 /* Wait for transmission to end */
+ 		  while(nrf24_isSending());
+
+        nrf24_powerUpRx();
+	_delay_ms(500); //wait a little while longer before repeat
+    }//while
+}//main
 /* ------------------------------------------------------------------------- */
 
 void light_func(uint8_t state) //latches Federal Signal circuit
 {  //toggles based on state
    static uint8_t light;
-	if(state == 'O' && light !=0){latch(light); light = 0;}
+   if(state == 'O' && light !=0){latch(light); light = 0;}
    else{
     if(light != state){latch(state); light = state;} 
-	}
+   }
 }
 
 void mp3_func(uint8_t cmd, uint8_t dat) //operates CATALEX MP3 Serial Board

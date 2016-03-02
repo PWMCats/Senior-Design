@@ -57,7 +57,7 @@ int main(void){
         if(nrf24_dataReady())
         {
             nrf24_getData(data_array);
-            if(data_array[2] == 0x55){
+            if(data_array[3] == 2){
               light_routine();
             }        
          /*   xprintf("> ");

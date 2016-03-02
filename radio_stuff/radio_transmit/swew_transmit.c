@@ -79,7 +79,7 @@ int main(void){
  nrf24_rx_address(rx_address);
 
  uint8_t start,light, track, snow; //for uart
-
+ uint16_t timeout;
  while(1){ //serial forever
 
   start = uart_getc();//wait for start byte
@@ -116,18 +116,18 @@ int main(void){
         }
        // else{uart_putc('N');} //N for no response
 
-		/* Retranmission count indicates the tranmission quality */
-		temp = nrf24_retransmissionCount();
+	/* Retranmission count indicates the tranmission quality */
+	temp = nrf24_retransmissionCount();
      // uart_putc(temp); //send the quality
-/*
+
       nrf24_powerUpRx();
    
-      if(nrf24_dataReady()){nrf24_getData(data_array);} //loads data array
+      while(!nrf24_dataReady()){if(timeout>2000){break;} timeout++;} //wait for transmission
+      if(nrf24_dataReady()){nrf24_getData(data_array); snow = data_array[3];} //loads data array
+      timeout = 0;
 
-     //check if correct data came back
-     snow = data_array[3];
-     uart_putc(snow); */
-     _delay_ms(100); //wait a little while before repeat
+      uart_putc(snow); 
+      _delay_ms(500); //wait a little while before repeat
 
  }//while
 }//main

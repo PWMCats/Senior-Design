@@ -20,7 +20,7 @@ import struct
 start=255
 light=5
 track=1
-snow =0
+snow =3
 
 values = (start, light, track, snow)
 
@@ -39,6 +39,6 @@ while 1 :
         #time.sleep(.5)
         #ser.flush() 
         out1 = ser.read(1) 
-        #out2 = ser.read(1) 
-	print out1#, out2
+        out2 = ser.read(1) 
+	print out1, ord(out2)
         time.sleep(.5)

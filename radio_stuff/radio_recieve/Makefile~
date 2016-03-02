@@ -1,6 +1,5 @@
-PRG            = swew_receive
-
-OBJ            = $(PRG).o ./nrf24L01_plus-master/nrf24.o ../uart.o
+PRG            = recieve_main_skel
+OBJ            = $(PRG).o ./nrf24L01_plus-master/nrf24.o ../uart.o 
 
 MCU_TARGET     = atmega32u4
 OPTIMIZE       = -O2    # options are 1, 2, 3, s

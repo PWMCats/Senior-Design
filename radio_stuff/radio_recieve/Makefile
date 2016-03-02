@@ -1,5 +1,4 @@
 PRG            = swew_receive
-
 OBJ            = $(PRG).o ./nrf24L01_plus-master/nrf24.o ../uart.o 
 
 MCU_TARGET     = atmega32u4
