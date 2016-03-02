@@ -6,7 +6,7 @@ import json
 import sys
 from PyQt4 import QtGui, QtCore
 
-#Alert Signals
+#Global Variables
 global light_selection
 light_selection = "No Light"
 global aural_selection
@@ -15,6 +15,11 @@ global hours
 hours = "0"
 global minutes
 minutes = "0"
+global current_light
+current_light = "No Light"
+global current_aural
+current_aural = "No Alert"
+
 
 #Temporary send function to print message
 def send(logic_code):
@@ -339,98 +344,157 @@ class Example(QtGui.QWidget):
         self.square.setStyleSheet("QWidget { background-color: %s }" %  
         self.comm_col.name())
         
+        #Update Timer
+        self.my_timer = QtCore.QTimer()
+        self.my_timer.timeout.connect(self.update_gui)
+        self.my_timer.start(6000) #6 sec interval
+        
     	#Activate Window
         self.setGeometry(150, 290, 400, 600)
         self.setWindowTitle('Severe Weather Warning System User Interface')
         self.show()
+        self.update_gui()
         
+    def update_gui(self):
+    	global current_light
+    	global current_aural
+    	print self.aural_alert
+    	self.aural_alert = QtGui.QLabel("%s" %current_aural, self)
+    	
+    	
     def clicked_button(self):
-		if light_selection == "No Light":
+    	global current_light
+    	global current_aural
+        if light_selection == "No Light":
+			current_light = "No Light"
 			if aural_selection == "No Alert":
 				send("0a0")
+				current_aural = "No Alert"
 			elif aural_selection == "Lightning1":
 				send("0b0")
+				current_aural = "Lightning1"
 			elif aural_selection == "Lightning2":
 				send("0c0")
+				current_aural = "Lightning2"
 			elif aural_selection == "Lightning3":
 				send("0d0")
+				current_aural = "Lightning3"
 			elif aural_selection == "Wind1":
 				send("0e0")
+				current_aural = "Wind1"
 			elif aural_selection == "Wind2":
 				send("0f0")
+				current_aural = "Wind2"
 			elif aural_selection == "Wind3":
 				send("0g0")
+				current_aural = "Wind3"
 			elif aural_selection == "Shelter":
 				send("0h0")
+				current_aural = "Shelter"
 			elif aural_selection == "Fuck":
 				send("0i0")
+				current_aural = "Fuck"
 			elif aural_selection == "Shit":
 				send("0j0")
-		elif light_selection == "Red":
+				current_aural = "Shit"
+        elif light_selection == "Red":
+			current_light = "Red"
 			if aural_selection == "No Alert":
 				send("Ra0")
+				current_aural = "No Alert"
 			elif aural_selection == "Lightning1":
 				send("Rb0")
+				current_aural = "Lightning1"
 			elif aural_selection == "Lightning2":
 				send("Rc0")
+				current_aural = "Lightning2"
 			elif aural_selection == "Lightning3":
 				send("Rd0")
+				current_aural = "Lightning3"
 			elif aural_selection == "Wind1":
 				send("Re0")
+				current_aural = "Wind1"
 			elif aural_selection == "Wind2":
 				send("Rf0")
+				current_aural = "Wind2"
 			elif aural_selection == "Wind3":
 				send("Rg0")
+				current_aural = "Wind3"
 			elif aural_selection == "Shelter":
 				send("Rh0")
+				current_aural = "Shelter"
 			elif aural_selection == "Fuck":
 				send("Ri0")
+				current_aural = "Fuck"
 			elif aural_selection == "Shit":
 				send("Rj0")
-		elif light_selection == "Yellow":
+				current_aural = "Shit"
+        elif light_selection == "Yellow":
+			current_light = "Yellow"
 			if aural_selection == "No Alert":
 				send("Ya0")
+				current_aural = "No Alert"
 			elif aural_selection == "Lightning1":
 				send("Yb0")
+				current_aural = "Lightning1"
 			elif aural_selection == "Lightning2":
 				send("Yc0")
+				current_aural = "Lightning2"
 			elif aural_selection == "Lightning3":
 				send("Yd0")
+				current_aural = "Lightning3"
 			elif aural_selection == "Wind1":
 				send("Ye0")
+				current_aural = "Wind1"
 			elif aural_selection == "Wind2":
 				send("Yf0")
+				current_aural = "Wind2"
 			elif aural_selection == "Wind3":
 				send("Yg0")
+				current_aural = "Wind3"
 			elif aural_selection == "Shelter":
 				send("Yh0")
+				current_aural = "Shelter"
 			elif aural_selection == "Fuck":
 				send("Yi0")
+				current_aural = "Fuck"
 			elif aural_selection == "Shit":
 				send("Yj0")
-		elif light_selection == "Blue":
+				current_aural = "Shit"
+        elif light_selection == "Blue":
+			current_light = "Blue"
 			if aural_selection == "No Alert":
 				send("Ba0")
+				current_aural = "No Alert"
 			elif aural_selection == "Lightning1":
 				send("Bb0")
+				current_aural = "Lightning1"
 			elif aural_selection == "Lightning2":
 				send("Bc0")
+				current_aural = "Lightning2"
 			elif aural_selection == "Lightning3":
 				send("Bd0")
+				current_aural = "Lightning3"
 			elif aural_selection == "Wind1":
 				send("Be0")
+				current_aural = "Wind1"
 			elif aural_selection == "Wind2":
 				send("Bf0")
+				current_aural = "Wind2"
 			elif aural_selection == "Wind3":
 				send("Bg0")
+				current_aural = "Wind3"
 			elif aural_selection == "Shelter":
 				send("Bh0")
+				current_aural = "Shelter"
 			elif aural_selection == "Fuck":
 				send("Bi0")
+				current_aural = "Fuck"
 			elif aural_selection == "Shit":
 				send("Bj0")
-		global minutes
-		if (int(minutes) > 0) or (int(hours) > 0):
+				current_aural = "Shit"
+        global minutes
+        if (int(minutes) > 0) or (int(hours) > 0):
 			self.timer = QtCore.QTimer()
 			self.timer.singleShot((int(hours)*3600000) + (int(minutes)*6000), self.off_signal)
 			
