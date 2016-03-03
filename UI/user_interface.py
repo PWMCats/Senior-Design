@@ -8,7 +8,7 @@ from PyQt4 import QtGui, QtCore
 
 #Global Variables
 global light_selection
-light_selection = "No Light"
+visual_selection = "No Light"
 global aural_selection
 aural_selection = "No Alert"
 global hours
@@ -19,7 +19,11 @@ global current_light
 current_light = "No Light"
 global current_aural
 current_aural = "No Alert"
-
+global previous_message
+previous_message = "initial message"
+global current_message
+current_message = "no message"
+global wind
 
 #Temporary send function to print message
 def send(logic_code):
@@ -51,62 +55,6 @@ def gather_direction():
 
 #This function checks for the most recent email in the inbox and 
 #Turns on the corresponding light and siren. 
-def handle_email(previous_message):
-	#Logs in to email account
-	mail = imaplib.IMAP4_SSL('imap.gmail.com')
-	mail.login('pwmcats@gmail.com', 'pussymoneyweed')
-	mail.list()
-	mail.select("inbox") # connect to inbox.
-	
-	result, data = mail.uid('search', None, "ALL") # search and return uids instead
-	latest_email_uid = data[0].split()[-1]
-	result, data = mail.uid('fetch', latest_email_uid, '(RFC822)')
-	raw_email = data[0][1]
-
-	email_message = email.message_from_string(raw_email)
-	
-	for part in email_message.walk():
-		# each part is a either non-multipart, or another multipart message
-		# that contains further parts... Message is organized like a tree
-		if part.get_content_type() == 'text/plain':
-			current_message = str(part.get_payload()) # stores current message
-			#Compare current email with different messages then turn on signal
-			#if no new email
-			if re.search(previous_message, current_message):
-				print 'stuck here'
-				return current_message
-			#check for lightning 1
-			elif re.search('lightning1', current_message):
-				send('BX0')
-				return current_message
-			#check for lightning 2
-			elif re.search('lightning2', current_message):
-				send('YX0')
-				return current_message
-			#check for lightning 3
-			elif re.search('lightning3', current_message):
-				send('RX0')
-				return current_message
-			#check for lightning off
-			elif re.search('lightning off', current_message):
-				send('OX0')
-				return current_message
-			#check for wind 1
-			elif re.search('wind1', current_message):
-				send('BX0')
-				return current_message
-			#check for wind 2
-			elif re.search('wind2', current_message):
-				send('YX0')
-				return current_message
-			#check for wind 3
-			elif re.search('wind3', current_message):
-				send('RX0')
-				return current_message
-			#check for wind off
-			elif re.search('wind off', current_message):
-				send('OX0')
-				return current_message
 
 #GUI window formatting
 class Example(QtGui.QWidget):
@@ -159,10 +107,10 @@ class Example(QtGui.QWidget):
         
         #Set Duration
         #Hour Dropdown Menu
-        self.lbl = QtGui.QLabel("Visual Alerts", self)
+        self.lbl = QtGui.QLabel("Hours", self)
         self.hour = QtGui.QComboBox(self)
         self.hour.setToolTip('Select the number of hours for the alert')
-        self.hour.addItem("Hours")
+        self.hour.addItem("Select")
         self.hour.addItem("0")
         self.hour.addItem("1")
         self.hour.addItem("2")
@@ -194,10 +142,10 @@ class Example(QtGui.QWidget):
         self.hour.activated[str].connect(self.hourchanged)
         
         #Aural Dropdown Menu
-        self.lbl = QtGui.QLabel("Aural Alerts", self)
+        self.lbl = QtGui.QLabel("Minutes", self)
         self.minute = QtGui.QComboBox(self)
         self.minute.setToolTip('Select the number of minutes for the alert')
-        self.minute.addItem("Minutes")
+        self.minute.addItem("Select")
         self.minute.addItem("0")
         self.minute.addItem("1")
         self.minute.addItem("2")
@@ -331,11 +279,10 @@ class Example(QtGui.QWidget):
         self.comm_lbl.move(0, 475)
         
         #Light Color
-        self.light_col = QtGui.QColor(0, 0, 255)
-        self.square = QtGui.QFrame(self)
-        self.square.setGeometry(43, 350, 50, 15)
-        self.square.setStyleSheet("QWidget { background-color: %s }" %  
-        self.light_col.name())
+        self.visual_alert = QtGui.QLabel("%s" %current_light, self)
+        self.visual_alert.move(43, 350)
+        newfont = QtGui.QFont("Times", 14, QtGui.QFont.Bold)
+        self.visual_alert.setFont(newfont)
         
         #Communication Status Indicator
         self.comm_col = QtGui.QColor(0, 255, 0)
@@ -344,28 +291,58 @@ class Example(QtGui.QWidget):
         self.square.setStyleSheet("QWidget { background-color: %s }" %  
         self.comm_col.name())
         
-        #Update Timer
-        self.my_timer = QtCore.QTimer()
-        self.my_timer.timeout.connect(self.update_gui)
-        self.my_timer.start(6000) #6 sec interval
-        
+        #Timers
+        self.update_timer = QtCore.QTimer()
+        self.update_timer.timeout.connect(self.update_gui)
+        self.update_timer.start(1000) #1 sec interval
+        self.weather_timer = QtCore.QTimer()
+        self.weather_timer.timeout.connect(self.update_weather)
+        self.weather_timer.start(30000)
+        self.email_timer = QtCore.QTimer()
+        self.email_timer.timeout.connect(self.handle_email)
+        self.email_timer.start(1000)
+                
     	#Activate Window
         self.setGeometry(150, 290, 400, 600)
         self.setWindowTitle('Severe Weather Warning System User Interface')
         self.show()
-        self.update_gui()
+    
+    def update_weather(self):
+    	global wind
+    	wind = gather_wind()
+    	wind_dir = gather_direction()
+    	temp = gather_temp()
+        self.wind_speed.setText("%s mph %s" %(wind, wind_dir))
+        self.temperature.setText("%s\xb0F" %temp)
+        self.check_wind()
+        
+    def check_wind(self):
+    	global current_light
+    	global current_aural
+    	global wind
+    	if (wind) > 30 and (wind) <= 40:
+    		current_light = "Blue"
+    		current_aural = "Wind1"
+    		send("Be0")
+    	elif (wind) > 40 and (wind) <= 50:
+    		current_light = "Yellow"
+    		current_aural = "Wind2"
+    		send("Yf0")
+    	elif (wind) > 50:
+    		current_light = "Yellow"
+    		current_aural = "Wind3"
+    		send("Rg0")
         
     def update_gui(self):
     	global current_light
     	global current_aural
-    	print self.aural_alert
-    	self.aural_alert = QtGui.QLabel("%s" %current_aural, self)
-    	
+    	self.aural_alert.setText(current_aural)
+    	self.visual_alert.setText(current_light)
     	
     def clicked_button(self):
     	global current_light
     	global current_aural
-        if light_selection == "No Light":
+        if visual_selection == "No Light":
 			current_light = "No Light"
 			if aural_selection == "No Alert":
 				send("0a0")
@@ -397,7 +374,7 @@ class Example(QtGui.QWidget):
 			elif aural_selection == "Shit":
 				send("0j0")
 				current_aural = "Shit"
-        elif light_selection == "Red":
+        elif visual_selection == "Red":
 			current_light = "Red"
 			if aural_selection == "No Alert":
 				send("Ra0")
@@ -429,7 +406,7 @@ class Example(QtGui.QWidget):
 			elif aural_selection == "Shit":
 				send("Rj0")
 				current_aural = "Shit"
-        elif light_selection == "Yellow":
+        elif visual_selection == "Yellow":
 			current_light = "Yellow"
 			if aural_selection == "No Alert":
 				send("Ya0")
@@ -461,7 +438,7 @@ class Example(QtGui.QWidget):
 			elif aural_selection == "Shit":
 				send("Yj0")
 				current_aural = "Shit"
-        elif light_selection == "Blue":
+        elif visual_selection == "Blue":
 			current_light = "Blue"
 			if aural_selection == "No Alert":
 				send("Ba0")
@@ -494,12 +471,21 @@ class Example(QtGui.QWidget):
 				send("Bj0")
 				current_aural = "Shit"
         global minutes
+        global hours
+        if minutes == "Select":
+        	minutes = "0"
+        if hours == "Select":
+        	hours = "0"
         if (int(minutes) > 0) or (int(hours) > 0):
 			self.timer = QtCore.QTimer()
 			self.timer.singleShot((int(hours)*3600000) + (int(minutes)*6000), self.off_signal)
 			
     def off_signal(self):
+		global current_light
+		global current_aural
 		send("0a0")
+		current_light = "No Light"
+		current_aural = "No Alert"
 				
     def visualchanged(self):
 		global visual_selection
@@ -516,6 +502,68 @@ class Example(QtGui.QWidget):
     def minutechanged(self):
     	global minutes
     	minutes = str(self.minute.currentText())
+    	
+    def handle_email(self):
+		global current_aural
+		global current_light
+		global previous_message
+		#Logs in to email account
+		mail = imaplib.IMAP4_SSL('imap.gmail.com')
+		mail.login('pwmcats@gmail.com', 'pussymoneyweed')
+		mail.list()
+		mail.select("inbox") # connect to inbox.
+	
+		result, data = mail.uid('search', None, "ALL") # search and return uids instead
+		latest_email_uid = data[0].split()[-1]
+		result, data = mail.uid('fetch', latest_email_uid, '(RFC822)')
+		raw_email = data[0][1]
+
+		email_message = email.message_from_string(raw_email)
+	
+		for part in email_message.walk():
+			# each part is a either non-multipart, or another multipart message
+			# that contains further parts... Message is organized like a tree
+		
+			if part.get_content_type() == 'text/plain':
+				current_message = str(part.get_payload()) # stores current message
+				#Compare current email with different messages then turn on signal
+				#if no new email
+				if re.search(previous_message, current_message):
+					previous_message = current_message
+				#check for lightning 1
+				elif re.search('lightning1', current_message):
+					send('BX0')
+					current_aural = "Lightning1"
+					current_light = "Blue"
+				#check for lightning 2
+				elif re.search('lightning2', current_message):
+					send('YX0')
+					current_aural = "Lightning2"
+					current_light = "Yellow"
+				#check for lightning 3
+				elif re.search('lightning3', current_message):
+					send('RX0')
+					current_aural = "Lightning3"
+					current_light = "Red"
+				#check for lightning off
+				elif re.search('lightning off', current_message):
+					send('OX0')
+					current_aural = "No Alert"
+					current_light = "No Light"
+				#check for wind 1
+				elif re.search('wind1', current_message):
+					send('BX0')
+				#check for wind 2
+				elif re.search('wind2', current_message):
+					send('YX0')
+				#check for wind 3
+				elif re.search('wind3', current_message):
+					send('RX0')
+				#check for wind off
+				elif re.search('wind off', current_message):
+					send('OX0')
+		previous_message = current_message
+
 	
 #main Function
 message = 'initial'    
