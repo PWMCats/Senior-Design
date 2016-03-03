@@ -58,9 +58,9 @@ def gather_direction():
 #Turns on the corresponding light and siren. 
 
 #GUI window formatting
-class Example(QtGui.QWidget):
+class Window(QtGui.QWidget):
     def __init__(self):
-        super(Example, self).__init__()
+        super(Window, self).__init__()
         
         self.initUI() 
     
@@ -585,7 +585,7 @@ class background_functions(QtCore.QThread):
 message = 'initial'    
 def main():
     app = QtGui.QApplication(sys.argv)
-    ex = Example()
+    GUI = Window()
     back = background_functions()
     back.start()
     sys.exit(app.exec_())
