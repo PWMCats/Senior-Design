@@ -5,6 +5,7 @@ import urllib2
 import json
 import sys
 from PyQt4 import QtGui, QtCore
+from PyQt4.QtCore import QThread
 
 #Global Variables
 global light_selection
@@ -230,6 +231,7 @@ class Example(QtGui.QWidget):
         newfont = QtGui.QFont("Times", 14, QtGui.QFont.Bold)
         self.aural_alert.setFont(newfont)
         self.aural_alert.move(45, 372)
+        self.aural_alert.resize(100, 20)
         
         
         #Wind Speed Display
@@ -241,7 +243,8 @@ class Example(QtGui.QWidget):
         self.wind_speed = QtGui.QLabel("%s mph %s" %(wind, direction), self)
         newfont = QtGui.QFont("Times", 14, QtGui.QFont.Bold)
         self.wind_speed.setFont(newfont)
-        self.wind_speed.move(140, 426)       
+        self.wind_speed.move(140, 426)
+        self.wind_speed.resize(150, 20)
         
         #Snowfall Height
         self.snow_lbl = QtGui.QLabel("Current Snow Pack:", self)
@@ -298,9 +301,6 @@ class Example(QtGui.QWidget):
         self.weather_timer = QtCore.QTimer()
         self.weather_timer.timeout.connect(self.update_weather)
         self.weather_timer.start(30000)
-        self.email_timer = QtCore.QTimer()
-        self.email_timer.timeout.connect(self.handle_email)
-        self.email_timer.start(1000)
                 
     	#Activate Window
         self.setGeometry(150, 290, 400, 600)
@@ -502,7 +502,22 @@ class Example(QtGui.QWidget):
     def minutechanged(self):
     	global minutes
     	minutes = str(self.minute.currentText())
-    	
+
+class background_functions(QtCore.QThread):
+    def __init__(self):
+        QThread.__init__(self)
+        
+        #Timer to handle emails
+        self.email_timer = QtCore.QTimer()
+        self.email_timer.timeout.connect(self.handle_email)
+        self.email_timer.start(5000)
+    
+    def start(self):
+        QtCore.QThread.start(self)
+
+    def run(self):
+        QtCore.QThread.run(self)    
+    
     def handle_email(self):
 		global current_aural
 		global current_light
@@ -563,14 +578,17 @@ class Example(QtGui.QWidget):
 				elif re.search('wind off', current_message):
 					send('OX0')
 		previous_message = current_message
+        
 
-	
+        
 #main Function
 message = 'initial'    
 def main():
-	app = QtGui.QApplication(sys.argv)
-	ex = Example()
-	sys.exit(app.exec_())
+    app = QtGui.QApplication(sys.argv)
+    ex = Example()
+    back = background_functions()
+    back.start()
+    sys.exit(app.exec_())
 	
 if __name__ == '__main__':
 	main()
