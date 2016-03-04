@@ -23,6 +23,8 @@ global current_light
 current_light = "No Light"
 global current_aural
 current_aural = "No Alert"
+global current_snow
+current_snow = 0
 global previous_message
 previous_message = "initial message"
 global current_message
@@ -39,16 +41,14 @@ ser = serial.Serial(
 
 
 #Temporary send function to print message
-def send(logic_code):
+def send(light, track, snow):
 	global ser
 	start=255
-	light = int(logic_code[0])
-	track = int(logic_code[1])
-	snow =  int(logic_code[2])
 	
 	code = ''
 	
 	values = (start, light, track, snow)
+	
 	for i in values:
 		code +=struct.pack('!B',i)
 	ser.write(code)
@@ -59,6 +59,43 @@ def send(logic_code):
 	out2 = ser.read(1)
 	print out1, ord(out2)
 	
+def convert_send()
+	global current_light
+	global current_aural
+	global current_snow
+	
+	#Convert current light signal to int
+	if current_light = "No Light"
+		light = 1
+	elif current_light = "Blue"
+		light = 2
+	elif current_light = "Yellow"
+		light = 3
+	elif current_light = "Red"
+		light = 4
+	
+	#Convert current aural signal to int	
+	if current_aural = "No Alert"
+		track = 1
+	elif current_aural = "Lightning1"
+		track = 2
+	elif current_aural = "Lightning2"
+		track = 3
+	elif current_aural = "Lightning3"
+		track = 4
+	elif current_aural = "Wind1"
+		track = 5
+	elif current_aural = "Wind1"
+		track = 6
+	elif current_aural = "Wind2"
+		track = 7
+	elif current_aural = "Wind3"
+		track = 8
+	
+	#Send current signal
+	send(light, track, current_snow)
+	
+		
 #Gather Weather Data From WunderGround and return wind speed
 def gather_wind():
 	f = urllib2.urlopen('http://api.wunderground.com/api/4bb2e676301d811b/conditions/q/WA/EVERETT.json')
@@ -352,153 +389,27 @@ class Window(QtGui.QWidget):
     	if (wind) > 30 and (wind) <= 40:
     		current_light = "Blue"
     		current_aural = "Wind1"
-    		send("B50")
     	elif (wind) > 40 and (wind) <= 50:
     		current_light = "Yellow"
     		current_aural = "Wind2"
-    		send("Y60")
     	elif (wind) > 50:
     		current_light = "Yellow"
     		current_aural = "Wind3"
-    		send("R70")
         
     def update_gui(self):
     	global current_light
     	global current_aural
     	self.aural_alert.setText(current_aural)
     	self.visual_alert.setText(current_light)
+    	convert_send()
     	
     def clicked_button(self):
     	global current_light
     	global current_aural
-        if visual_selection == "No Light":
-			current_light = "No Light"
-			if aural_selection == "No Alert":
-				send("010")
-				current_aural = "No Alert"
-			elif aural_selection == "Lightning1":
-				send("020")
-				current_aural = "Lightning1"
-			elif aural_selection == "Lightning2":
-				send("030")
-				current_aural = "Lightning2"
-			elif aural_selection == "Lightning3":
-				send("040")
-				current_aural = "Lightning3"
-			elif aural_selection == "Wind1":
-				send("050")
-				current_aural = "Wind1"
-			elif aural_selection == "Wind2":
-				send("060")
-				current_aural = "Wind2"
-			elif aural_selection == "Wind3":
-				send("070")
-				current_aural = "Wind3"
-			elif aural_selection == "Shelter":
-				send("080")
-				current_aural = "Shelter"
-			elif aural_selection == "Fuck":
-				send("090")
-				current_aural = "Fuck"
-			elif aural_selection == "Shit":
-				send("0a0")
-				current_aural = "Shit"
-        elif visual_selection == "Red":
-			current_light = "Red"
-			if aural_selection == "No Alert":
-				send("710")
-				current_aural = "No Alert"
-			elif aural_selection == "Lightning1":
-				send("Rb0")
-				current_aural = "Lightning1"
-			elif aural_selection == "Lightning2":
-				send("Rc0")
-				current_aural = "Lightning2"
-			elif aural_selection == "Lightning3":
-				send("Rd0")
-				current_aural = "Lightning3"
-			elif aural_selection == "Wind1":
-				send("Re0")
-				current_aural = "Wind1"
-			elif aural_selection == "Wind2":
-				send("Rf0")
-				current_aural = "Wind2"
-			elif aural_selection == "Wind3":
-				send("Rg0")
-				current_aural = "Wind3"
-			elif aural_selection == "Shelter":
-				send("Rh0")
-				current_aural = "Shelter"
-			elif aural_selection == "Fuck":
-				send("Ri0")
-				current_aural = "Fuck"
-			elif aural_selection == "Shit":
-				send("Rj0")
-				current_aural = "Shit"
-        elif visual_selection == "Yellow":
-			current_light = "Yellow"
-			if aural_selection == "No Alert":
-				send("Ya0")
-				current_aural = "No Alert"
-			elif aural_selection == "Lightning1":
-				send("Yb0")
-				current_aural = "Lightning1"
-			elif aural_selection == "Lightning2":
-				send("Yc0")
-				current_aural = "Lightning2"
-			elif aural_selection == "Lightning3":
-				send("Yd0")
-				current_aural = "Lightning3"
-			elif aural_selection == "Wind1":
-				send("Ye0")
-				current_aural = "Wind1"
-			elif aural_selection == "Wind2":
-				send("Yf0")
-				current_aural = "Wind2"
-			elif aural_selection == "Wind3":
-				send("Yg0")
-				current_aural = "Wind3"
-			elif aural_selection == "Shelter":
-				send("Yh0")
-				current_aural = "Shelter"
-			elif aural_selection == "Fuck":
-				send("Yi0")
-				current_aural = "Fuck"
-			elif aural_selection == "Shit":
-				send("Yj0")
-				current_aural = "Shit"
-        elif visual_selection == "Blue":
-			current_light = "Blue"
-			if aural_selection == "No Alert":
-				send("Ba0")
-				current_aural = "No Alert"
-			elif aural_selection == "Lightning1":
-				send("Bb0")
-				current_aural = "Lightning1"
-			elif aural_selection == "Lightning2":
-				send("Bc0")
-				current_aural = "Lightning2"
-			elif aural_selection == "Lightning3":
-				send("Bd0")
-				current_aural = "Lightning3"
-			elif aural_selection == "Wind1":
-				send("Be0")
-				current_aural = "Wind1"
-			elif aural_selection == "Wind2":
-				send("Bf0")
-				current_aural = "Wind2"
-			elif aural_selection == "Wind3":
-				send("Bg0")
-				current_aural = "Wind3"
-			elif aural_selection == "Shelter":
-				send("Bh0")
-				current_aural = "Shelter"
-			elif aural_selection == "Fuck":
-				send("Bi0")
-				current_aural = "Fuck"
-			elif aural_selection == "Shit":
-				send("Bj0")
-				current_aural = "Shit"
+    	
+    	current_light = visual_selection
+    	current_aural = aural_selection
+        
         global minutes
         global hours
         if minutes == "Select":
@@ -576,36 +487,29 @@ class background_functions(QtCore.QThread):
 					previous_message = current_message
 				#check for lightning 1
 				elif re.search('lightning1', current_message):
-					send('BX0')
 					current_aural = "Lightning1"
 					current_light = "Blue"
 				#check for lightning 2
 				elif re.search('lightning2', current_message):
-					send('YX0')
 					current_aural = "Lightning2"
 					current_light = "Yellow"
 				#check for lightning 3
 				elif re.search('lightning3', current_message):
-					send('RX0')
 					current_aural = "Lightning3"
 					current_light = "Red"
 				#check for lightning off
 				elif re.search('lightning off', current_message):
-					send('OX0')
 					current_aural = "No Alert"
 					current_light = "No Light"
 				#check for wind 1
 				elif re.search('wind1', current_message):
-					send('BX0')
 				#check for wind 2
 				elif re.search('wind2', current_message):
-					send('YX0')
 				#check for wind 3
 				elif re.search('wind3', current_message):
-					send('RX0')
 				#check for wind off
 				elif re.search('wind off', current_message):
-					send('OX0')
+				
 		previous_message = current_message
         
 
