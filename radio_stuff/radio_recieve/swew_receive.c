@@ -113,7 +113,7 @@ int main()
 	    {
 	     light_func(data_array[1]);
 	      mp3_func(CMD_PLAY_W_INDEX, data_array[2]);
-              light_test_routine();
+          //    light_test_routine();
             }
   	    if(data_array[3]) //snow check is set
 	    { 

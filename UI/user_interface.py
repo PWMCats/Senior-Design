@@ -59,38 +59,38 @@ def send(light, track, snow):
 	out2 = ser.read(1)
 	print out1, ord(out2)
 	
-def convert_send()
+def convert_send():
 	global current_light
 	global current_aural
 	global current_snow
 	
 	#Convert current light signal to int
-	if current_light = "No Light"
-		light = 1
-	elif current_light = "Blue"
-		light = 2
-	elif current_light = "Yellow"
-		light = 3
-	elif current_light = "Red"
-		light = 4
+	if current_light == "No Light":
+		light = 0
+	elif current_light == "Blue":
+		light = 5
+	elif current_light == "Yellow":
+		light = 6
+	elif current_light == "Red":
+		light = 7
 	
 	#Convert current aural signal to int	
-	if current_aural = "No Alert"
+	if current_aural == "No Alert":
+		track = 0
+	elif current_aural == "Lightning1":
 		track = 1
-	elif current_aural = "Lightning1"
+	elif current_aural == "Lightning2":
 		track = 2
-	elif current_aural = "Lightning2"
+	elif current_aural == "Lightning3":
 		track = 3
-	elif current_aural = "Lightning3"
+	elif current_aural == "Wind1":
 		track = 4
-	elif current_aural = "Wind1"
+	elif current_aural == "Wind2":
 		track = 5
-	elif current_aural = "Wind1"
+	elif current_aural == "Wind3":
 		track = 6
-	elif current_aural = "Wind2"
+	elif current_aural == "fuck":
 		track = 7
-	elif current_aural = "Wind3"
-		track = 8
 	
 	#Send current signal
 	send(light, track, current_snow)
@@ -401,7 +401,6 @@ class Window(QtGui.QWidget):
     	global current_aural
     	self.aural_alert.setText(current_aural)
     	self.visual_alert.setText(current_light)
-    	convert_send()
     	
     def clicked_button(self):
     	global current_light
@@ -502,16 +501,16 @@ class background_functions(QtCore.QThread):
 					current_aural = "No Alert"
 					current_light = "No Light"
 				#check for wind 1
-				elif re.search('wind1', current_message):
+				#elif re.search('wind1', current_message):
 				#check for wind 2
-				elif re.search('wind2', current_message):
+				#elif re.search('wind2', current_message):
 				#check for wind 3
-				elif re.search('wind3', current_message):
+				#elif re.search('wind3', current_message):
 				#check for wind off
-				elif re.search('wind off', current_message):
+				#elif re.search('wind off', current_message):
 				
-		previous_message = current_message
-        
+		previous_message = current_message        
+    		convert_send()
 
         
 #main Function
