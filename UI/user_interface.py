@@ -4,6 +4,9 @@ import re
 import urllib2
 import json
 import sys
+import time
+import serial
+import struct
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import QThread
 
@@ -25,10 +28,35 @@ previous_message = "initial message"
 global current_message
 current_message = "no message"
 global wind
+global ser
+ser = serial.Serial(
+    port='/dev/ttyUSB0',
+    baudrate=9600,
+    parity=serial.PARITY_NONE,
+    stopbits=serial.STOPBITS_ONE,
+    bytesize=serial.EIGHTBITS
+)
+
 
 #Temporary send function to print message
 def send(logic_code):
-	print logic_code
+	global ser
+	start=255
+	light = int(logic_code[0])
+	track = int(logic_code[1])
+	snow = int(logic_code[2])
+	
+	code = ''
+	
+	for i in values:
+		code +=struct.pack('!B',i)
+	ser.write(code)
+	print values
+	out = ''
+	#ser.fluch()
+	out1 = ser.read(1)
+	out2 = ser.read(1)
+	print out1, ord(out2)
 	
 #Gather Weather Data From WunderGround and return wind speed
 def gather_wind():
@@ -323,15 +351,15 @@ class Window(QtGui.QWidget):
     	if (wind) > 30 and (wind) <= 40:
     		current_light = "Blue"
     		current_aural = "Wind1"
-    		send("Be0")
+    		send("B50")
     	elif (wind) > 40 and (wind) <= 50:
     		current_light = "Yellow"
     		current_aural = "Wind2"
-    		send("Yf0")
+    		send("Y60")
     	elif (wind) > 50:
     		current_light = "Yellow"
     		current_aural = "Wind3"
-    		send("Rg0")
+    		send("R70")
         
     def update_gui(self):
     	global current_light
@@ -345,34 +373,34 @@ class Window(QtGui.QWidget):
         if visual_selection == "No Light":
 			current_light = "No Light"
 			if aural_selection == "No Alert":
-				send("0a0")
+				send("010")
 				current_aural = "No Alert"
 			elif aural_selection == "Lightning1":
-				send("0b0")
+				send("020")
 				current_aural = "Lightning1"
 			elif aural_selection == "Lightning2":
-				send("0c0")
+				send("030")
 				current_aural = "Lightning2"
 			elif aural_selection == "Lightning3":
-				send("0d0")
+				send("040")
 				current_aural = "Lightning3"
 			elif aural_selection == "Wind1":
-				send("0e0")
+				send("050")
 				current_aural = "Wind1"
 			elif aural_selection == "Wind2":
-				send("0f0")
+				send("060")
 				current_aural = "Wind2"
 			elif aural_selection == "Wind3":
-				send("0g0")
+				send("070")
 				current_aural = "Wind3"
 			elif aural_selection == "Shelter":
-				send("0h0")
+				send("080")
 				current_aural = "Shelter"
 			elif aural_selection == "Fuck":
-				send("0i0")
+				send("090")
 				current_aural = "Fuck"
 			elif aural_selection == "Shit":
-				send("0j0")
+				send("0a0")
 				current_aural = "Shit"
         elif visual_selection == "Red":
 			current_light = "Red"
