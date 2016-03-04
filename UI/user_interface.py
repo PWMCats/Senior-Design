@@ -44,10 +44,11 @@ def send(logic_code):
 	start=255
 	light = int(logic_code[0])
 	track = int(logic_code[1])
-	snow = int(logic_code[2])
+	snow =  int(logic_code[2])
 	
 	code = ''
 	
+	values = (start, light, track, snow)
 	for i in values:
 		code +=struct.pack('!B',i)
 	ser.write(code)
@@ -405,7 +406,7 @@ class Window(QtGui.QWidget):
         elif visual_selection == "Red":
 			current_light = "Red"
 			if aural_selection == "No Alert":
-				send("Ra0")
+				send("710")
 				current_aural = "No Alert"
 			elif aural_selection == "Lightning1":
 				send("Rb0")
