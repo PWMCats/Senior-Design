@@ -30,6 +30,10 @@ previous_message = "initial message"
 global current_message
 current_message = "no message"
 global wind
+global communication
+communication = "Excellent"
+global comm_status
+comm_status = "O"
 global ser
 ser = serial.Serial(
     port='/dev/ttyUSB0',
@@ -43,6 +47,7 @@ ser = serial.Serial(
 #Temporary send function to print message
 def send(light, track, snow):
 	global ser
+	global comm_status
 	start=255
 	
 	code = ''
@@ -57,6 +62,7 @@ def send(light, track, snow):
 	#ser.fluch()
 	out1 = ser.read(1)
 	out2 = ser.read(1)
+	comm_status
 	print out1, ord(out2)
 	
 def convert_send():
@@ -346,6 +352,8 @@ class Window(QtGui.QWidget):
         #Communication Status
         self.comm_lbl = QtGui.QLabel("Communication Status:", self)
         self.comm_lbl.move(0, 475)
+        self.comm = QtGui.QLabel("Excellent", self)
+        self.comm.move(155, 475)
         
         #Light Color
         self.visual_alert = QtGui.QLabel("%s" %current_light, self)
@@ -375,9 +383,14 @@ class Window(QtGui.QWidget):
     
     def update_weather(self):
     	global wind
+    	global current_snow
     	wind = gather_wind()
     	wind_dir = gather_direction()
     	temp = gather_temp()
+    	if int(wind) > 35:
+    		current_snow = 0
+    	else:
+    		current_snow = 1
         self.wind_speed.setText("%s mph %s" %(wind, wind_dir))
         self.temperature.setText("%s\xb0F" %temp)
         self.check_wind()
@@ -399,6 +412,13 @@ class Window(QtGui.QWidget):
     def update_gui(self):
     	global current_light
     	global current_aural
+    	global comm_status
+    	global communication
+    	if comm_status == "O":
+    		communication = "Excellent"
+    	else:
+    		communication = "Lost"
+    	self.comm.setText(communication)
     	self.aural_alert.setText(current_aural)
     	self.visual_alert.setText(current_light)
     	
