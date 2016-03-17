@@ -88,7 +88,7 @@ def convert_send():
 	elif current_aural == "Lightning2":
 		track = 2
 	elif current_aural == "Lightning3":
-		track = 3
+		track = 1
 	elif current_aural == "Wind1":
 		track = 4
 	elif current_aural == "Wind2":
