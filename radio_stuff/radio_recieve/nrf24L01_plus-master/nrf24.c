@@ -366,10 +366,10 @@ void nrf24_writeRegister(uint8_t reg, uint8_t* value, uint8_t len)
 void nrf24_setupPins()
 {
     set_bit(DDRB,0); // CE output
-    set_bit(DDRB,4); // CSN output
-    set_bit(DDRB,7); // SCK output
-    set_bit(DDRB,5); // MOSI output
-    clr_bit(DDRB,6); // MISO input
+    set_bit(DDRB,1); // CSN output
+    set_bit(DDRB,2); // SCK output
+    set_bit(DDRB,3); // MOSI output
+    clr_bit(DDRB,4); // MISO input
 }
 
 /* nrf24 CE pin control function
@@ -390,38 +390,38 @@ void nrf24_csn_digitalWrite(uint8_t state)
 {
     if(state)
     {
-        set_bit(PORTB,4);
+        set_bit(PORTB,1);
     }
     else
     {
-        clr_bit(PORTB,4);
+        clr_bit(PORTB,1);
     }
 }
 void nrf24_sck_digitalWrite(uint8_t state)
 {
     if(state)
     {
-        set_bit(PORTB,7);
+        set_bit(PORTB,2);
     }
     else
     {
-        clr_bit(PORTB,7);
+        clr_bit(PORTB,2);
     }
 }
 void nrf24_mosi_digitalWrite(uint8_t state)
 {
     if(state)
     {
-        set_bit(PORTB,5);
+        set_bit(PORTB,3);
     }
     else
     {
-        clr_bit(PORTB,5);
+        clr_bit(PORTB,3);
     }
 }
 uint8_t nrf24_miso_digitalRead()
 {
-    return check_bit(PINB,6);
+    return check_bit(PINB,4);
 }
 
 

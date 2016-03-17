@@ -1,17 +1,8 @@
-/* nrf license
-* ----------------------------------------------------------------------------
-* “THE COFFEEWARE LICENSE” (Revision 1):
-* <ihsan@kehribar.me> wrote this file. As long as you retain this notice you
-* can do whatever you want with this stuff. If we meet some day, and you think this stuff is worth it, you can buy me a coffee in return.
-* -----------------------------------------------------------------------------
-*/
-
 #include <avr/io.h>
 #include <stdint.h>
-#include "./nrf24L01_plus-master/nrf24.h"
 #include <util/delay.h>
-#include "../swew.h" //general purpose header
-#include "../uart.h" // Uses Spencer Kresge's uart_funtions
+#include "swew.h" //general purpose header
+#include "uart.h" // Uses Spencer Kresge's uart_funtions
 
 //*****************************
 // SWWS Data Structures and variables
@@ -21,13 +12,6 @@
 #define OFF 0
 unsigned char playmode = 1; 
 static int8_t Send_buf[8] = {0};
-
-//nrf control variables
-uint8_t temp;
-uint8_t q = 0;
-uint8_t data_array[4];
-uint8_t tx_address[5] = {0xD7,0xD7,0xD7,0xD7,0xD7};
-uint8_t rx_address[5] = {0xE7,0xE7,0xE7,0xE7,0xE7};
 
 //snowfall variables
 uint8_t reading;
@@ -46,26 +30,35 @@ void adc_init(void){
 void port_init(void){
 
   //Init PORTD to turn on lights
+  DDRB |= 0xFF;
   DDRD |= (1<<PD7)|(1<<PD6)|(1<<PD5); //set light pins to output
   DDRF |= (1<<PF7); //set pin 7 to output for snowfall
 
 }
 //*****************************
 
-//*****************************
-// for testing
-void light_test_routine(void){
- uint16_t i, ii; 
 
- for(ii=5; ii<8; ii++){
-  for(i=0;i<250; i++){
-   PORTD |= (1<<ii);
-   _delay_ms(2);
-   PORTD = 0;
-  }
- }//for
-}//light routine
 //*****************************
+// Timer/Counter Initialization
+void tcnt_init(void){
+
+  TIMSK0  |=  (1<<TOIE0);  //enable timer/counter0 overflow interrupt
+  TCCR0B  |=  (1<<CS01) | (1<<CS00);  //normal mode, clock source, no prescale
+
+  //Configure TIMER1 for PWM output
+  TCCR1A|=(1<<COM1A1)|(1<<COM1B1)|(1<<COM1C1)|(1<<WGM11); //NON Inverted PWM
+  TCCR1B|=(1<<WGM13)|(1<<WGM12)|(1<<CS10); //PRESCALER=64 MODE 14(FAST PWM)
+
+  ICR1=4999;  //fPWM=423.6Hz (Period = 2.4ms Standard). 
+}
+//*****************************
+
+//Assigns PWM bottom to vary wavelength
+void light_em_up(uint8_t i){
+   OCR1A= light_val[i][2]; 
+   OCR1B= light_val[i][1];
+   OCR1C= light_val[i][0];
+}
 
 
 //MAIN
@@ -74,56 +67,44 @@ int main()
 {
     CPU_PRESCALE(CPU_8MHz);
     port_init();
-    adc_init(); //son of a bitch
+    //deactivate relay (it's active low)
+    PORTD |= 0xE0;
+    adc_init(); 
     uart_init();
     mp3_func(CMD_SET_VOLUME, MAX_VOL);
+    tcnt_init();
 
-    //deactivate relay (it's active low)
-    PORTD |= 0x00;
  
+    uint8_t start,light, track, snow; //for uart
     static uint8_t timeout;
-    /* init hardware pins */
-    nrf24_init();
-    
-    /* Channel #21 , payload length: 4 */
-    nrf24_config(21,4);
- 
-    /* Set the device addresses */
-    nrf24_tx_address(tx_address);
-    nrf24_rx_address(rx_address);
 
    while(1)
    {    
-        //if(playmode==PLAY){q++; if(q>50){playmode = OFF;q=0;}}
+	  start = uart_getc();//wait for start byte
+	  light = uart_getc();
+	  if(light == 5){light_em_up(BLUE);}
+	  else if(light == 6){light_em_up(YELLOW);}
+	  else if(light == 7){light_em_up(RED);}
+	  else{light_em_up(7);}
 
-      while(!nrf24_dataReady()){if(timeout>1000){break;} timeout++;} //wait for transmission
-      if(nrf24_dataReady())
-      {
-            nrf24_getData(data_array); 	
-	    if(data_array[0] == 0xFF) //warning system control
+	  track = uart_getc();
+	  snow = uart_getc();
+
+	    if(start == 0xFF) //warning system control
 	    {
-	     light_func(data_array[1]);
-	      mp3_func(CMD_PLAY_W_INDEX, data_array[2]);
-          //    light_test_routine();
+	     light_func(light);
+	      mp3_func(CMD_PLAY_W_INDEX, track);
             }
-  	    if(data_array[3]) //snow check is set
+  	    if(snow) //snow check is set
 	    { 
 	     ADCSRA |= 1<<ADSC; //request value
 	     while (bit_is_clear(ADCSRA, ADIF)){} //shouldn't take long
 	     reading = ADCH;
-  	     data_array[3] = reading;
+  	     snow = reading;
 	    }
-        }  
-       
-        	//*****************************
-        // Radio Operation - send snow data back
-	 /* Automatically goes to TX mode */
-		  nrf24_send(data_array);        
-			  
-	 /* Wait for transmission to end */
- 		  while(nrf24_isSending());
-
-        nrf24_powerUpRx();
+        
+        uart_putc('O');
+        uart_putc(snow); 
 	_delay_ms(500); //wait a little while longer before repeat
     }//while
 }//main
@@ -138,9 +119,11 @@ void light_func(uint8_t new_light) //latches Federal Signal circuit
    } 
 }
 
-void mp3_func(uint8_t cmd, uint8_t dat) //operates CATALEX MP3 Serial Board
+void mp3_func(uint8_t cmd, uint8_t dat) 
 {
-  uint8_t i;
+  clr_bit(PORTB, (dat-1));
+
+  /*uint8_t i; //operates CATALEX MP3 Serial Board
   if(dat > 0){
 	  Send_buf[0] = 0x7e; // start byte
 	  Send_buf[1] = 0xff; // version
@@ -155,5 +138,5 @@ void mp3_func(uint8_t cmd, uint8_t dat) //operates CATALEX MP3 Serial Board
 		 uart_putc(Send_buf[i]) ;
 	  }
 	  playmode = PLAY;
-  }
+  }*/
 }

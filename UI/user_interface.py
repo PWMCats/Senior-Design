@@ -62,7 +62,7 @@ def send(light, track, snow):
 	#ser.fluch()
 	out1 = ser.read(1)
 	out2 = ser.read(1)
-	comm_status
+	comm_status = out1
 	print out1, ord(out2)
 	
 def convert_send():
@@ -362,11 +362,11 @@ class Window(QtGui.QWidget):
         self.visual_alert.setFont(newfont)
         
         #Communication Status Indicator
-        self.comm_col = QtGui.QColor(0, 255, 0)
-        self.square = QtGui.QFrame(self)
-        self.square.setGeometry(155, 477, 50, 15)
-        self.square.setStyleSheet("QWidget { background-color: %s }" %  
-        self.comm_col.name())
+        #self.comm_col = QtGui.QColor(0, 255, 0)
+        #self.square = QtGui.QFrame(self)
+        #self.square.setGeometry(155, 477, 50, 15)
+        #self.square.setStyleSheet("QWidget { background-color: %s }" %  
+        #self.comm_col.name())
         
         #Timers
         self.update_timer = QtCore.QTimer()

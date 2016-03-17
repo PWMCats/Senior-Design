@@ -71,7 +71,6 @@ int main(void){
  port_init();
  tcnt_init();
  uart_init();
- //light_em_up(7);
  nrf24_init();
  nrf24_config(21,4); //channel #21, payload length 4
 
@@ -85,8 +84,10 @@ int main(void){
   start = uart_getc();//wait for start byte
   light = uart_getc();
   if(light == 5){light_em_up(BLUE);}
-  if(light == 6){light_em_up(YELLOW);}
-  if(light == 7){light_em_up(RED);}
+  else if(light == 6){light_em_up(YELLOW);}
+  else if(light == 7){light_em_up(RED);}
+  else{light_em_up(7);}
+
   track = uart_getc();
   snow = uart_getc();
 

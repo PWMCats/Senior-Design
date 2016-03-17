@@ -42,7 +42,7 @@
 #define RED 0
 //Trevor Love's RGB Lookup Table
                                 //   R     G     B
-extern uint16_t light_val[8][3] ={  {3000,    0,    0}, //red 
+    uint16_t light_val[8][3] ={  {3000,    0,    0}, //red 
                                  {4000,  600,    0}, //yellow
                                  {   0, 3000,    0}, //green
                                  {   0,    0, 3000}, //blue

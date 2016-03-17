@@ -53,21 +53,8 @@ void port_init(void){
 //*****************************
 
 //*****************************
-void latch(uint8_t light_pin){
-  uint8_t i;
-
-  set_bit(PORTD, light_pin);
-  for(i=0; i<100; i++){
-	_delay_ms(2); //200ms pulse
-  }
-  clr_bit(PORTD, light_pin); //toggles latch
-}
-//*****************************
-
-//*****************************
 // for testing
 void light_test_routine(void){
-
  uint16_t i, ii; 
 
  for(ii=5; ii<8; ii++){
@@ -89,26 +76,30 @@ int main()
     port_init();
     adc_init(); //son of a bitch
     uart_init();
-    mp3_func(CMD_SET_VOLUME, MAX_VOL); 
+    mp3_func(CMD_SET_VOLUME, MAX_VOL);
+
+    //deactivate relay (it's active low)
+    PORTD |= 0x00;
+ 
     static uint8_t timeout;
     /* init hardware pins */
-    nrf24_init();
+ //   nrf24_init();
     
     /* Channel #21 , payload length: 4 */
-    nrf24_config(21,4);
+ //   nrf24_config(21,4);
  
     /* Set the device addresses */
-    nrf24_tx_address(tx_address);
-    nrf24_rx_address(rx_address);
+ //   nrf24_tx_address(tx_address);
+ //   nrf24_rx_address(rx_address);
 
    while(1)
    {    
         //if(playmode==PLAY){q++; if(q>50){playmode = OFF;q=0;}}
 
-      while(!nrf24_dataReady()){if(timeout>1000){break;} timeout++;} //wait for transmission
-      if(nrf24_dataReady())
+    //  while(!nrf24_dataReady()){if(timeout>1000){break;} timeout++;} //wait for transmission
+    //  if(nrf24_dataReady())
       {
-            nrf24_getData(data_array); 	
+    //        nrf24_getData(data_array); 	
 	    if(data_array[0] == 0xFF) //warning system control
 	    {
 	     light_func(data_array[1]);
@@ -127,24 +118,24 @@ int main()
         	//*****************************
         // Radio Operation - send snow data back
 	 /* Automatically goes to TX mode */
-		  nrf24_send(data_array);        
+	//	  nrf24_send(data_array);        
 			  
 	 /* Wait for transmission to end */
- 		  while(nrf24_isSending());
+ 	//	  while(nrf24_isSending());
 
-        nrf24_powerUpRx();
+       // nrf24_powerUpRx();
 	_delay_ms(500); //wait a little while longer before repeat
     }//while
 }//main
 /* ------------------------------------------------------------------------- */
 
-void light_func(uint8_t state) //latches Federal Signal circuit
+void light_func(uint8_t new_light) //latches Federal Signal circuit
 {  //toggles based on state
-   static uint8_t light;
-   if(state == 'O' && light !=0){latch(light); light = 0;}
+   static uint8_t old_light;         
+   if((new_light == 0) && (old_light !=0)){set_bit(PORTD, old_light); old_light = 0;} //turn light off
    else{
-    if(light != state){latch(state); light = state;} 
-   }
+    if(old_light != new_light){set_bit(PORTD, old_light); clr_bit(PORTD, new_light); old_light = new_light;} //record which light is on
+   } 
 }
 
 void mp3_func(uint8_t cmd, uint8_t dat) //operates CATALEX MP3 Serial Board
