@@ -95,8 +95,6 @@ def convert_send():
 		track = 5
 	elif current_aural == "Wind3":
 		track = 6
-	elif current_aural == "fuck":
-		track = 7
 	
 	#Send current signal
 	send(light, track, current_snow)
@@ -169,10 +167,7 @@ class Window(QtGui.QWidget):
         self.aural.addItem("Lightning3")  
         self.aural.addItem("Wind1")  
         self.aural.addItem("Wind2")  
-        self.aural.addItem("Wind3")  
-        self.aural.addItem("Shelter")  
-        self.aural.addItem("Fuck")  
-        self.aural.addItem("Shit")
+        self.aural.addItem("Wind3")
         
         self.aural.move(200, 75)
         self.lbl.move(202, 55)
@@ -361,20 +356,13 @@ class Window(QtGui.QWidget):
         newfont = QtGui.QFont("Times", 14, QtGui.QFont.Bold)
         self.visual_alert.setFont(newfont)
         
-        #Communication Status Indicator
-        #self.comm_col = QtGui.QColor(0, 255, 0)
-        #self.square = QtGui.QFrame(self)
-        #self.square.setGeometry(155, 477, 50, 15)
-        #self.square.setStyleSheet("QWidget { background-color: %s }" %  
-        #self.comm_col.name())
-        
         #Timers
         self.update_timer = QtCore.QTimer()
         self.update_timer.timeout.connect(self.update_gui)
         self.update_timer.start(1000) #1 sec interval
         self.weather_timer = QtCore.QTimer()
         self.weather_timer.timeout.connect(self.update_weather)
-        self.weather_timer.start(30000)
+        self.weather_timer.start(45000) #Change to 240000
                 
     	#Activate Window
         self.setGeometry(150, 290, 400, 600)
@@ -387,12 +375,14 @@ class Window(QtGui.QWidget):
     	wind = gather_wind()
     	wind_dir = gather_direction()
     	temp = gather_temp()
-    	if int(wind) > 35:
+    	if int(temp) < 35:
     		current_snow = 0
     	else:
     		current_snow = 1
         self.wind_speed.setText("%s mph %s" %(wind, wind_dir))
         self.temperature.setText("%s\xb0F" %temp)
+        print("The current wind speed is:")
+        print("%s mph %s" %(wind, wind_dir))
         self.check_wind()
         
     def check_wind(self):
@@ -437,12 +427,11 @@ class Window(QtGui.QWidget):
         	hours = "0"
         if (int(minutes) > 0) or (int(hours) > 0):
 			self.timer = QtCore.QTimer()
-			self.timer.singleShot((int(hours)*3600000) + (int(minutes)*6000), self.off_signal)
+			self.timer.singleShot((int(hours)*3600000) + (int(minutes)*60000), self.off_signal)
 			
     def off_signal(self):
 		global current_light
 		global current_aural
-		send("0a0")
 		current_light = "No Light"
 		current_aural = "No Alert"
 				
@@ -513,7 +502,7 @@ class background_functions(QtCore.QThread):
 					current_aural = "Lightning2"
 					current_light = "Yellow"
 				#check for lightning 3
-				elif re.search('lightning3', current_message):
+				elif re.search('Type 3 Lightning', current_message):
 					current_aural = "Lightning3"
 					current_light = "Red"
 				#check for lightning off
