@@ -375,7 +375,7 @@ class Window(QtGui.QWidget):
     	wind = gather_wind()
     	wind_dir = gather_direction()
     	temp = gather_temp()
-    	if int(temp) < 35:
+    	if temp < 35:
     		current_snow = 0
     	else:
     		current_snow = 1
