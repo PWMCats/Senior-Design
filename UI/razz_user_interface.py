@@ -120,10 +120,11 @@ def set_state():
 def gather_weather():
     global f
     f = urllib2.urlopen('http://api.wunderground.com/api/4bb2e676301d811b/conditions/q/WA/EVERETT.json')
-
+    
 #Return wind speed    
 def gather_wind():
-	global f
+	#global f
+	f = urllib2.urlopen('http://api.wunderground.com/api/4bb2e676301d811b/conditions/q/WA/EVERETT.json')
 	json_string = f.read()
 	parsed_json = json.loads(json_string)
 	wind_speed = parsed_json['current_observation']['wind_mph']
