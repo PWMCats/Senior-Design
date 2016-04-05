@@ -1,3 +1,13 @@
+###############################################################################
+# User Interface for Raspberry Pi
+#
+# Created By: Antonio Perez
+#
+# Date: 3/31/16
+#
+###############################################################################
+
+#Import all libraries
 import imaplib
 import email
 import re
@@ -12,30 +22,38 @@ from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import QThread
 import RPi.GPIO as GPIO
 
-#Global Variables
-global light_selection
+#Declare all Global Variables
+global light_selection                  #Current Dropdown Light Selection
+global aural_selection                  #Current Dropdown Aural Selection
+global hours                            #Current Dropdown Hour Selection
+global minutes                          #Current Dropdown Minute Selection
+global current_light                    #Current Light Selection
+global current_aural                    #Current Aural Selection
+global previous_light                   #Previous Light Selection
+global previous_aural                   #Previous Aural Selection
+global current_snow                     #Snow Detector on or off
+global current_message                  #Current Email Message
+global wind                             #Current Wind Speed
+global communication                    #Current Communication Statues
+global comm_status                      #Communication acknowledgement from uC
+global f                                #Wunderground data
+
+#Give each global variable an initial value
 visual_selection = "No Light"
-global aural_selection
 aural_selection = "No Alert"
-global hours
 hours = "0"
-global minutes
 minutes = "0"
-global current_light
 current_light = "No Light"
-global current_aural
 current_aural = "No Alert"
-global current_snow
+previous_light = "none"
+previous_aural = "none"
 current_snow = 0
-global previous_message
 previous_message = "initial message"
-global current_message
 current_message = "no message"
-global wind
-global communication
 communication = "Excellent"
-global comm_status
 comm_status = "O"
+f = urllib2.urlopen('http://api.wunderground.com/api/4bb2e676301d811b/conditions/q/WA/EVERETT.json')
+
 
 #Setup GPIOS
 GPIO.setmode (GPIO.BCM)
@@ -55,67 +73,76 @@ def set_state():
 	global current_snow
 	
 	#Activate Visual Alert
-	if current_light == "No Light": #all off
-		GPIO.output(16, True)
-		GPIO.output(20, True)
-		GPIO.output(21, True)
-	elif current_light == "Blue": #blue on
-		GPIO.output(16, False)
-	elif current_light == "Yellow": #yellow on
-		GPIO.output(20, False)
-	elif current_light == "Red": #red on
-		GPIO.output(21, False)
+	if current_light != previous_light:         #Check for new light command
+	    if current_light == "No Light":         #all off
+		    GPIO.output(16, True)
+		    GPIO.output(20, True)
+		    GPIO.output(21, True)
+	    elif current_light == "Blue":           #blue on
+		    GPIO.output(16, False)
+	    elif current_light == "Yellow":         #yellow on
+		    GPIO.output(20, False)
+	    elif current_light == "Red":            #red on
+		    GPIO.output(21, False)
 	
 	#Activate Aural Alert
-	if current_aural == "No Alert":
-		#do nothing
-		track = 0
-	elif current_aural == "Lightning1":
-		Aural=subprocess.Popen(['omxplayer','./001lightning.mp3'], \
-		stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
-	elif current_aural == "Lightning2":
-		Aural=subprocess.Popen(['omxplayer','./002lightning_passed.mp3'], \
-		stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
-	elif current_aural == "Lightning3": #nothing happens yet
-		#do nothing
-		track = 0
-	elif current_aural == "Wind1":
-		Aural=subprocess.Popen(['omxplayer','./003high_winds_approaching.mp3'], \
-		stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
-	elif current_aural == "Wind2":
-		Aural=subprocess.Popen(['omxplayer','./004high_winds.mp3'],  \
-		stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
-	elif current_aural == "Wind3":
-		Aural=subprocess.Popen(['omxplayer','./005high_winds_passed.mp3'], \
-		stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
+	if current_aural != previous_aural          #Check for new aural command
+	    if current_aural == "No Alert":
+		    #do nothing
+	    	track = 0
+	    elif current_aural == "Lightning1":
+	    	Aural=subprocess.Popen(['omxplayer','./001lightning.mp3'], \
+    		stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
+        	elif current_aural == "Lightning2":
+	    	Aural=subprocess.Popen(['omxplayer','./002lightning_passed.mp3'], \
+	    	stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
+    	elif current_aural == "Lightning3": #nothing happens yet
+    		#do nothing
+    		track = 0
+    	elif current_aural == "Wind1":
+    		Aural=subprocess.Popen(['omxplayer','./003high_winds_approaching.mp3'], \
+    		stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
+    	elif current_aural == "Wind2":
+    		Aural=subprocess.Popen(['omxplayer','./004high_winds.mp3'],  \
+    		stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
+    	elif current_aural == "Wind3":
+    		Aural=subprocess.Popen(['omxplayer','./005high_winds_passed.mp3'], \
+    		stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
+    
+    #Update current signals 
+    current_light = previous_light
+    current_aural = previous_aural
 
 
-#Gather Weather Data From WunderGround and return wind speed
+#Gather Weather Data From WunderGround
+def gather_weather():
+    global f
+    f = urllib2.urlopen('http://api.wunderground.com/api/4bb2e676301d811b/conditions/q/WA/EVERETT.json')
+
+#Return wind speed    
 def gather_wind():
-	f = urllib2.urlopen('http://api.wunderground.com/api/4bb2e676301d811b/conditions/q/WA/EVERETT.json')
+	global f
 	json_string = f.read()
 	parsed_json = json.loads(json_string)
 	wind_speed = parsed_json['current_observation']['wind_mph']
 	return float(wind_speed)
 	
-#Gather Weather Data From WunderGround and return Temp in F
+#Return Temp in F
 def gather_temp():
-	f = urllib2.urlopen('http://api.wunderground.com/api/4bb2e676301d811b/conditions/q/WA/EVERETT.json')
+	global f
 	json_string = f.read()
 	parsed_json = json.loads(json_string)
 	temp_f = parsed_json['current_observation']['temp_f']
 	return str(temp_f)
 
-#Gather Weather Data From WunderGround and return wind direction
+#Return wind direction
 def gather_direction():
-	f = urllib2.urlopen('http://api.wunderground.com/api/4bb2e676301d811b/conditions/q/WA/EVERETT.json')
+	global f
 	json_string = f.read()
 	parsed_json = json.loads(json_string)
 	direction = parsed_json['current_observation']['wind_dir']
 	return str(direction)
 
-#This function checks for the most recent email in the inbox and 
-#Turns on the corresponding light and siren. 
 
 #GUI window formatting
 class Window(QtGui.QWidget):
@@ -124,20 +151,22 @@ class Window(QtGui.QWidget):
         
         self.initUI() 
     
+    #initialize GUI
     def initUI(self):
-		#Button
+		#Send Alert Button
         QtGui.QToolTip.setFont(QtGui.QFont('SansSerif', 10))
-        
         self.activate_button = QtGui.QPushButton('Send Alert', self)
-        self.activate_button.setToolTip('This activates the set alerts')
+        self.activate_button.setToolTip('This activates the selected alerts')
         self.activate_button.resize(self.activate_button.sizeHint())
         self.activate_button.move(125, 225)
-        self.activate_button.clicked.connect(self.clicked_button)
+        self.activate_button.clicked.connect(self.clicked_button)   #When clicked, call clicked_button
         
         #Visual Dropdown Menu
         self.lbl = QtGui.QLabel("Visual Alerts", self)
         self.visual = QtGui.QComboBox(self)
         self.visual.setToolTip('Select the visual alert you want to activate')
+        
+        #Add visual dropdown options
         self.visual.addItem("No Light")
         self.visual.addItem("Red")
         self.visual.addItem("Yellow")
@@ -145,12 +174,16 @@ class Window(QtGui.QWidget):
         
         self.visual.move(50, 75)
         self.lbl.move(52, 55)
+        
+        #When dropdown option selected, call visualchanged
         self.visual.activated[str].connect(self.visualchanged)
         
         #Aural Dropdown Menu
         self.lbl = QtGui.QLabel("Aural Alerts", self)
         self.aural = QtGui.QComboBox(self)
         self.aural.setToolTip('Select the aural alert you want to activate')
+        
+        #Add aural dropdown options
         self.aural.addItem("No Alert")
         self.aural.addItem("Lightning1")
         self.aural.addItem("Lightning2")  
@@ -161,6 +194,8 @@ class Window(QtGui.QWidget):
         
         self.aural.move(200, 75)
         self.lbl.move(202, 55)
+        
+        #When dropdown option selected, call auralchanged
         self.aural.activated[str].connect(self.auralchanged)
         
         #Set Duration
@@ -169,11 +204,15 @@ class Window(QtGui.QWidget):
         self.hour = QtGui.QComboBox(self)
         self.hour.setToolTip('Select the number of hours for the alert')
         self.hour.addItem("Select")
+        
+        #add hour dropdown options
         for i in xrange(24):
-         self.hour.addItem("0")
+         self.hour.addItem(str(i))
         
         self.hour.move(50, 175)
         self.lbl.move(52, 155)
+        
+        #When dropdown option selected, call hourchanged
         self.hour.activated[str].connect(self.hourchanged)
         
         #Aural Dropdown Menu
@@ -181,15 +220,19 @@ class Window(QtGui.QWidget):
         self.minute = QtGui.QComboBox(self)
         self.minute.setToolTip('Select the number of minutes for the alert')
         self.minute.addItem("Select")
+        
+        #add minute dropdown options
         for i in xrange(60):
          self.minute.addItem(str(i))
 
         self.minute.move(200, 175)
-        
         self.lbl.move(202, 155) 
+        
+        #when dropdown option selected, call minutechanged
         self.minute.activated[str].connect(self.minutechanged) 
         
-        #Temp Display
+        #Set up temperature display and set initial temperature
+        gather_weather()
         temp = gather_temp()
         self.temp_lbl = QtGui.QLabel("Current Temperature:", self)
         self.temp_lbl.move(0, 400)
@@ -199,7 +242,7 @@ class Window(QtGui.QWidget):
         self.temperature.setFont(newfont)
         self.temperature.move(147, 398)
         
-        #Aural Display
+        #Set up Aural Display and display initial aural
         self.aural_lbl = QtGui.QLabel("Aural:", self)
         self.aural_lbl.move(0, 375)
         
@@ -210,7 +253,7 @@ class Window(QtGui.QWidget):
         self.aural_alert.resize(100, 20)
         
         
-        #Wind Speed Display
+        #Set up Wind Speed Display and display initial wind speed
         wind = gather_wind()
         direction = gather_direction()
         self.wind_lbl = QtGui.QLabel("Current Wind Speed:", self)
@@ -222,7 +265,7 @@ class Window(QtGui.QWidget):
         self.wind_speed.move(140, 426)
         self.wind_speed.resize(150, 20)
         
-        #Snowfall Height
+        #Setup Snowfall Height Display
         self.snow_lbl = QtGui.QLabel("Current Snow Pack:", self)
         self.snow_lbl.move(0, 450)
         
@@ -265,22 +308,29 @@ class Window(QtGui.QWidget):
         newfont = QtGui.QFont("Times", 14, QtGui.QFont.Bold)
         self.visual_alert.setFont(newfont)
         
+        
+        
         #Timers
+        #Start timer to update GUI
         self.update_timer = QtCore.QTimer()
         self.update_timer.timeout.connect(self.update_gui)
         self.update_timer.start(1000) #1 sec interval
+        
+        #Start timer to update weather
         self.weather_timer = QtCore.QTimer()
         self.weather_timer.timeout.connect(self.update_weather)
-        self.weather_timer.start(45000) #Change to 240000
+        self.weather_timer.start(600000) #10 minute timer
                 
     	#Activate Window
         self.setGeometry(150, 290, 400, 600)
         self.setWindowTitle('Severe Weather Warning System User Interface')
         self.show()
     
+    #Update the wind speed, wind direction and temperature
     def update_weather(self):
     	global wind
     	global current_snow
+    	gather_weather()
     	wind = gather_wind()
     	wind_dir = gather_direction()
     	temp = gather_temp()
@@ -293,7 +343,8 @@ class Window(QtGui.QWidget):
         print("The current wind speed is:")
         print("%s mph %s" %(wind, wind_dir))
         self.check_wind()
-        
+    
+    #Determine if wind speed should trigger an alert    
     def check_wind(self):
     	global current_light
     	global current_aural
@@ -307,7 +358,8 @@ class Window(QtGui.QWidget):
     	elif (wind) > 50:
     		current_light = "Red"
     		current_aural = "Wind3"
-        
+    
+    #Update the text in the GUI for communication and current alerts    
     def update_gui(self):
     	global current_light
     	global current_aural
@@ -320,7 +372,8 @@ class Window(QtGui.QWidget):
     	self.comm.setText(communication)
     	self.aural_alert.setText(current_aural)
     	self.visual_alert.setText(current_light)
-    	
+    
+    #Set alert button actions	
     def clicked_button(self):
     	global current_light
     	global current_aural
@@ -379,7 +432,6 @@ class background_functions(QtCore.QThread):
     def handle_email(self):
 		global current_aural
 		global current_light
-		global previous_message
 		#Logs in to email account
 		mail = imaplib.IMAP4_SSL('imap.gmail.com')
 		mail.login('pwmcats@gmail.com', 'pussymoneyweed')
@@ -427,14 +479,7 @@ class background_functions(QtCore.QThread):
 				#elif re.search('wind3', current_message):
 				#check for wind off
 				#elif re.search('wind off', current_message):
-
-		#only act on toggle
-                #if previous_message != current_message:
-                set_state()
-		
-		previous_message = current_message        
-
-        
+            
 #main Function
 message = 'initial'    
 def main():
