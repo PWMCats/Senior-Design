@@ -68,51 +68,53 @@ GPIO.output(21, True)
 
 #Sets the hardware in the Severe Weather Warning System
 def set_state():
-	global current_light
-	global current_aural
-	global current_snow
+    global current_light
+    global current_aural
+    global previous_light
+    global previous_aural
+    global current_snow
 	
-	#Activate Visual Alert
-	if current_light != previous_light:         #Check for new light command
-	    if current_light == "No Light":         #all off
-		    GPIO.output(16, True)
-		    GPIO.output(20, True)
-		    GPIO.output(21, True)
-	    elif current_light == "Blue":           #blue on
-		    GPIO.output(16, False)
-	    elif current_light == "Yellow":         #yellow on
-		    GPIO.output(20, False)
-	    elif current_light == "Red":            #red on
-		    GPIO.output(21, False)
+    #Activate Visual Alert
+    if current_light != previous_light:         #Check for new light command
+        if current_light == "No Light":         #all off
+            GPIO.output(16, True)
+            GPIO.output(20, True)
+            GPIO.output(21, True)
+        elif current_light == "Blue":           #blue on
+            GPIO.output(16, False)
+        elif current_light == "Yellow":         #yellow on
+            GPIO.output(20, False)
+        elif current_light == "Red":            #red on
+            GPIO.output(21, False)
 	
 	#Activate Aural Alert
-	if current_aural != previous_aural          #Check for new aural command
-	    if current_aural == "No Alert":
-		    #do nothing
-	    	track = 0
-	    elif current_aural == "Lightning1":
-	    	Aural=subprocess.Popen(['omxplayer','./001lightning.mp3'], \
-    		stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
-        	elif current_aural == "Lightning2":
-	    	Aural=subprocess.Popen(['omxplayer','./002lightning_passed.mp3'], \
-	    	stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
-    	elif current_aural == "Lightning3": #nothing happens yet
-    		#do nothing
-    		track = 0
-    	elif current_aural == "Wind1":
-    		Aural=subprocess.Popen(['omxplayer','./003high_winds_approaching.mp3'], \
-    		stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
-    	elif current_aural == "Wind2":
-    		Aural=subprocess.Popen(['omxplayer','./004high_winds.mp3'],  \
-    		stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
-    	elif current_aural == "Wind3":
-    		Aural=subprocess.Popen(['omxplayer','./005high_winds_passed.mp3'], \
-    		stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
-    
-    #Update current signals 
-    current_light = previous_light
-    current_aural = previous_aural
+    if current_aural != previous_aural:          #Check for new aural command
+        if current_aural == "No Alert":
+            #do nothing
+            track = 0
+        elif current_aural == "Lightning1":
+            Aural=subprocess.Popen(['omxplayer','./001lightning.mp3'], \
+            stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
+        elif current_aural == "Lightning2":
+            Aural=subprocess.Popen(['omxplayer','./002lightning_passed.mp3'], \
+            stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
+        elif current_aural == "Lightning3": #nothing happens yet
+            #do nothing
+            track = 0
+        elif current_aural == "Wind1":
+            Aural=subprocess.Popen(['omxplayer','./003high_winds_approaching.mp3'], \
+            stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
+        elif current_aural == "Wind2":
+            Aural=subprocess.Popen(['omxplayer','./004high_winds.mp3'],  \
+            stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
+        elif current_aural == "Wind3":
+            Aural=subprocess.Popen(['omxplayer','./005high_winds_passed.mp3'], \
+            stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
 
+    #Update Current Signals		
+    previous_light = current_light
+    previous_aural = current_aural
+    
 
 #Gather Weather Data From WunderGround
 def gather_weather():
