@@ -36,7 +36,7 @@ global current_message                  #Current Email Message
 global wind                             #Current Wind Speed
 global communication                    #Current Communication Statues
 global comm_status                      #Communication acknowledgement from uC
-global f                                #Wunderground data
+#global f                                #Wunderground data
 
 #Give each global variable an initial value
 visual_selection = "No Light"
@@ -52,7 +52,7 @@ previous_message = "initial message"
 current_message = "no message"
 communication = "Excellent"
 comm_status = "O"
-f = urllib2.urlopen('http://api.wunderground.com/api/4bb2e676301d811b/conditions/q/WA/EVERETT.json')
+#f = urllib2.urlopen('http://api.wunderground.com/api/4bb2e676301d811b/conditions/q/WA/EVERETT.json')
 
 
 #Setup GPIOS
@@ -118,8 +118,8 @@ def set_state():
 
 #Gather Weather Data From WunderGround
 def gather_weather():
-    global f
-    f = urllib2.urlopen('http://api.wunderground.com/api/4bb2e676301d811b/conditions/q/WA/EVERETT.json')
+    #global f
+    #f = urllib2.urlopen('http://api.wunderground.com/api/4bb2e676301d811b/conditions/q/WA/EVERETT.json')
     
 #Return wind speed    
 def gather_wind():
@@ -132,7 +132,8 @@ def gather_wind():
 	
 #Return Temp in F
 def gather_temp():
-	global f
+	#global f
+	f = urllib2.urlopen('http://api.wunderground.com/api/4bb2e676301d811b/conditions/q/WA/EVERETT.json')
 	json_string = f.read()
 	parsed_json = json.loads(json_string)
 	temp_f = parsed_json['current_observation']['temp_f']
@@ -140,7 +141,8 @@ def gather_temp():
 
 #Return wind direction
 def gather_direction():
-	global f
+	#global f
+	f = urllib2.urlopen('http://api.wunderground.com/api/4bb2e676301d811b/conditions/q/WA/EVERETT.json')
 	json_string = f.read()
 	parsed_json = json.loads(json_string)
 	direction = parsed_json['current_observation']['wind_dir']
