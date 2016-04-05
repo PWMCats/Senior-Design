@@ -117,7 +117,7 @@ def set_state():
     
 
 #Gather Weather Data From WunderGround
-def gather_weather():
+#def gather_weather():
     #global f
     #f = urllib2.urlopen('http://api.wunderground.com/api/4bb2e676301d811b/conditions/q/WA/EVERETT.json')
     
@@ -237,7 +237,7 @@ class Window(QtGui.QWidget):
         self.minute.activated[str].connect(self.minutechanged) 
         
         #Set up temperature display and set initial temperature
-        gather_weather()
+        #gather_weather()
         temp = gather_temp()
         self.temp_lbl = QtGui.QLabel("Current Temperature:", self)
         self.temp_lbl.move(0, 400)
@@ -335,7 +335,7 @@ class Window(QtGui.QWidget):
     def update_weather(self):
     	global wind
     	global current_snow
-    	gather_weather()
+    	#gather_weather()
     	wind = gather_wind()
     	wind_dir = gather_direction()
     	temp = gather_temp()
