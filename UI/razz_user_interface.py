@@ -488,6 +488,8 @@ class background_functions(QtCore.QThread):
 				#elif re.search('wind3', current_message):
 				#check for wind off
 				#elif re.search('wind off', current_message):
+				
+		previous_message = current_message
             
 #main Function
 message = 'initial'    
