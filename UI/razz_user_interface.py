@@ -378,6 +378,7 @@ class Window(QtGui.QWidget):
     	self.comm.setText(communication)
     	self.aural_alert.setText(current_aural)
     	self.visual_alert.setText(current_light)
+    	set_state()
     
     #Set alert button actions	
     def clicked_button(self):
