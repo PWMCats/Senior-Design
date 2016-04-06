@@ -33,6 +33,7 @@ global previous_light                   #Previous Light Selection
 global previous_aural                   #Previous Aural Selection
 global current_snow                     #Snow Detector on or off
 global current_message                  #Current Email Message
+global previous_message                 #Previous Email Message
 global wind                             #Current Wind Speed
 global communication                    #Current Communication Statues
 global comm_status                      #Communication acknowledgement from uC
