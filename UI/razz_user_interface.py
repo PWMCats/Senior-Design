@@ -438,6 +438,8 @@ class background_functions(QtCore.QThread):
     def handle_email(self):
 		global current_aural
 		global current_light
+		global current_message
+		global previous_message
 		#Logs in to email account
 		mail = imaplib.IMAP4_SSL('imap.gmail.com')
 		mail.login('pwmcats@gmail.com', 'pussymoneyweed')
