@@ -16,11 +16,12 @@ import json
 import sys
 import time
 import subprocess
-import serial
+#import serial
 import struct
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import QThread
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
+import pysftp
 
 #Declare all Global Variables
 global light_selection                  #Current Dropdown Light Selection
@@ -55,18 +56,6 @@ communication = "Excellent"
 comm_status = "O"
 #f = urllib2.urlopen('http://api.wunderground.com/api/4bb2e676301d811b/conditions/q/WA/EVERETT.json')
 
-
-#Setup GPIOS
-GPIO.setmode (GPIO.BCM)
-GPIO.setwarnings (False)
-GPIO.setup(16, GPIO.OUT)
-GPIO.setup(20, GPIO.OUT)
-GPIO.setup(21, GPIO.OUT)
-
-GPIO.output(16, True)
-GPIO.output(20, True)
-GPIO.output(21, True)
-
 #Sets the hardware in the Severe Weather Warning System
 def set_state():
     global current_light
@@ -77,40 +66,27 @@ def set_state():
 	
     #Activate Visual Alert
     if current_light != previous_light:         #Check for new light command
-        if current_light == "No Light":         #all off
-            GPIO.output(16, True)
-            GPIO.output(20, True)
-            GPIO.output(21, True)
-        elif current_light == "Blue":           #blue on
-            GPIO.output(16, False)
-        elif current_light == "Yellow":         #yellow on
-            GPIO.output(20, False)
-        elif current_light == "Red":            #red on
-            GPIO.output(21, False)
+        light = open('light.txt', 'w')
+        light.seek(0)
+        light.truncate()
+        light.write(str(current_light))
+        light.close()
+        srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
+        srv.chdir('public_html')
+        srv.put('light.txt')
+        srv.close()
 	
 	#Activate Aural Alert
     if current_aural != previous_aural:          #Check for new aural command
-        if current_aural == "No Alert":
-            #do nothing
-            track = 0
-        elif current_aural == "Lightning1":
-            Aural=subprocess.Popen(['omxplayer','./001lightning.mp3'], \
-            stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
-        elif current_aural == "Lightning2":
-            Aural=subprocess.Popen(['omxplayer','./002lightning_passed.mp3'], \
-            stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
-        elif current_aural == "Lightning3": #nothing happens yet
-            #do nothing
-            track = 0
-        elif current_aural == "Wind1":
-            Aural=subprocess.Popen(['omxplayer','./003high_winds_approaching.mp3'], \
-            stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
-        elif current_aural == "Wind2":
-            Aural=subprocess.Popen(['omxplayer','./004high_winds.mp3'],  \
-            stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
-        elif current_aural == "Wind3":
-            Aural=subprocess.Popen(['omxplayer','./005high_winds_passed.mp3'], \
-            stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
+        aural = open('siren.txt', 'w')
+        aural.seek(0)
+        aural.truncate()
+        aural.write(str(current_aural))
+        aural.close()
+        srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
+        srv.chdir('public_html')
+        srv.put('siren.txt')
+        srv.close()
 
     #Update Current Signals		
     previous_light = current_light
