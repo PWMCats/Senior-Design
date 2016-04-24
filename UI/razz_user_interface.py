@@ -1,5 +1,5 @@
 ###############################################################################
-# User Interface for Raspberry Pi
+# User Interface
 #
 # Created By: Antonio Perez
 #
@@ -15,12 +15,9 @@ import urllib2
 import json
 import sys
 import time
-import subprocess
-#import serial
 import struct
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import QThread
-#import RPi.GPIO as GPIO
 import pysftp
 
 #Declare all Global Variables
@@ -54,7 +51,6 @@ previous_message = "initial message"
 current_message = "no message"
 communication = "Excellent"
 comm_status = "O"
-#f = urllib2.urlopen('http://api.wunderground.com/api/4bb2e676301d811b/conditions/q/WA/EVERETT.json')
 
 #Sets the hardware in the Severe Weather Warning System
 def set_state():
@@ -92,15 +88,8 @@ def set_state():
     previous_light = current_light
     previous_aural = current_aural
     
-
-#Gather Weather Data From WunderGround
-#def gather_weather():
-    #global f
-    #f = urllib2.urlopen('http://api.wunderground.com/api/4bb2e676301d811b/conditions/q/WA/EVERETT.json')
-    
 #Return wind speed    
 def gather_wind():
-	#global f
 	f = urllib2.urlopen('http://api.wunderground.com/api/4bb2e676301d811b/conditions/q/WA/EVERETT.json')
 	json_string = f.read()
 	parsed_json = json.loads(json_string)
@@ -109,7 +98,6 @@ def gather_wind():
 	
 #Return Temp in F
 def gather_temp():
-	#global f
 	f = urllib2.urlopen('http://api.wunderground.com/api/4bb2e676301d811b/conditions/q/WA/EVERETT.json')
 	json_string = f.read()
 	parsed_json = json.loads(json_string)
@@ -118,7 +106,6 @@ def gather_temp():
 
 #Return wind direction
 def gather_direction():
-	#global f
 	f = urllib2.urlopen('http://api.wunderground.com/api/4bb2e676301d811b/conditions/q/WA/EVERETT.json')
 	json_string = f.read()
 	parsed_json = json.loads(json_string)

@@ -1,8 +1,19 @@
+###############################################################################
+# Raspberry Pi Alert Handler
+#
+# Created By: Antonio Perez
+#
+# Date: 3/31/16
+#
+###############################################################################
+
+#Import all libraries
 import urllib2
 import threading
-import serial
+import subprocess
 import RPi.GPIO as GPIO
 
+#Create Global Variables
 global current_light
 global current_aural
 global previous_light
