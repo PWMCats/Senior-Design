@@ -38,9 +38,11 @@ GPIO.output(21, True)
 def get_alerts():
     global current_light
     global current_aural
-    current_light = urllib2.urlopen('http://web.engr.oregonstate.edu/~pereza/light.txt').read()
-    current_aural = urllib2.urlopen('http://web.engr.oregonstate.edu/~pereza/siren.txt').read()
-
+    #current_light = urllib2.urlopen('http://web.engr.oregonstate.edu/~pereza/light.txt').read()
+    #current_aural = urllib2.urlopen('http://web.engr.oregonstate.edu/~pereza/siren.txt').read()
+    current_light = open('light.txt','r')
+    current_aural = open('siren.txt','r')
+    
 def set_alerts():
     global current_light
     global current_aural

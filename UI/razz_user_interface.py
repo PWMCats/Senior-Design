@@ -67,10 +67,15 @@ def set_state():
         light.truncate()
         light.write(str(current_light))
         light.close()
-        srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
-        srv.chdir('public_html')
-        srv.put('light.txt')
-        srv.close()
+        try:
+            #srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
+            srv = pysftp.Connection(host = "10.0.0.4", username="pi", password="raspberry")
+            #srv.chdir('public_html')
+            srv.chdir('Desktop')
+            srv.put('light.txt')
+            srv.close()
+        except:
+            print("Node 1 Connection Error")
 	
 	#Activate Aural Alert
     if current_aural != previous_aural:          #Check for new aural command
@@ -79,8 +84,10 @@ def set_state():
         aural.truncate()
         aural.write(str(current_aural))
         aural.close()
-        srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
-        srv.chdir('public_html')
+        #srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
+        srv = pysftp.Connection(host = "10.0.0.4", username="pi", password="raspberry")
+        #srv.chdir('public_html')
+        srv.chdir('Desktop')
         srv.put('siren.txt')
         srv.close()
 
@@ -441,6 +448,9 @@ class background_functions(QtCore.QThread):
 					current_light = "Red"
 				#check for lightning off
 				elif re.search('lightning off', current_message):
+					current_aural = "No Alert"
+					current_light = "No Light"
+				elif re.search('Lightning off', current_message):
 					current_aural = "No Alert"
 					current_light = "No Light"
 				#check for wind 1
