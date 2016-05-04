@@ -38,10 +38,10 @@ GPIO.output(21, True)
 def get_alerts():
     global current_light
     global current_aural
-    #current_light = urllib2.urlopen('http://web.engr.oregonstate.edu/~pereza/light.txt').read()
-    #current_aural = urllib2.urlopen('http://web.engr.oregonstate.edu/~pereza/siren.txt').read()
-    current_light = open('light.txt','r')
-    current_aural = open('siren.txt','r')
+    current_light = urllib2.urlopen('http://web.engr.oregonstate.edu/~pereza/light.txt').read()
+    current_aural = urllib2.urlopen('http://web.engr.oregonstate.edu/~pereza/siren.txt').read()
+    #current_light = open('light.txt','r')
+    #current_aural = open('siren.txt','r')
     
 def set_alerts():
     global current_light
@@ -60,6 +60,7 @@ def set_alerts():
             GPIO.output(20, False)
         elif current_light == "Red":            #red on
             GPIO.output(21, False)
+        print current_light
             
     if current_aural != previous_aural:
         if current_aural == "No Alert":
@@ -83,6 +84,7 @@ def set_alerts():
         elif current_aural == "Wind3":
             Aural=subprocess.Popen(['omxplayer','./005high_winds_passed.mp3'], \
             stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE, close_fds=True)
+        print current_aural
         
     previous_light = current_light
     previous_aural = current_aural
