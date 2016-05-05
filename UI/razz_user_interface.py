@@ -36,6 +36,8 @@ global wind                             #Current Wind Speed
 global communication                    #Current Communication Statues
 global comm_status                      #Communication acknowledgement from uC
 #global f                                #Wunderground data
+global node_1
+global node_2
 
 #Give each global variable an initial value
 visual_selection = "No Light"
@@ -51,6 +53,8 @@ previous_message = "initial message"
 current_message = "no message"
 communication = "Excellent"
 comm_status = "O"
+node_1 = "Excellent"
+node_2 = "Excellent"
 
 #Sets the hardware in the Severe Weather Warning System
 def set_state():
@@ -59,6 +63,8 @@ def set_state():
     global previous_light
     global previous_aural
     global current_snow
+    global node_1
+    global node_2
 	
     #Activate Visual Alert
     if current_light != previous_light:         #Check for new light command
@@ -67,6 +73,8 @@ def set_state():
         light.truncate()
         light.write(str(current_light))
         light.close()
+        
+        #Send Commands to Node_1
         try:
             srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
             #srv = pysftp.Connection(host = "10.248.214.248", username="pi", password="raspberry")
@@ -74,9 +82,22 @@ def set_state():
             #srv.chdir('Desktop')
             srv.put('light.txt')
             srv.close()
+            node_1 = "Excellent"
         except:
-            print("Node 1 Connection Error")
-	
+            node_1 = "Connection Error"
+            
+        #Send Commands to Node_2
+        try:
+            srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
+            #srv = pysftp.Connection(host = "10.248.214.248", username="pi", password="raspberry")
+            srv.chdir('public_html')
+            #srv.chdir('Desktop')
+            srv.put('light.txt')
+            srv.close()
+            node_2 = "Excellent"
+        except:
+            node_2 = "Connection Error"
+            
 	#Activate Aural Alert
     if current_aural != previous_aural:          #Check for new aural command
         aural = open('siren.txt', 'w')
@@ -84,13 +105,31 @@ def set_state():
         aural.truncate()
         aural.write(str(current_aural))
         aural.close()
-        srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
-        #srv = pysftp.Connection(host = "10.0.0.4", username="pi", password="raspberry")
-        srv.chdir('public_html')
-        #srv.chdir('Desktop')
-        srv.put('siren.txt')
-        srv.close()
-
+        
+        #Send Command to Node_1
+        try:
+            srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
+            #srv = pysftp.Connection(host = "10.0.0.4", username="pi", password="raspberry")
+            srv.chdir('public_html')
+            #srv.chdir('Desktop')
+            srv.put('siren.txt')
+            srv.close()
+            node_1 = "Excellent"
+        except:
+            node_1 = "Connection Error"
+            
+        #Send Command to Node_2
+        try:
+            srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
+            #srv = pysftp.Connection(host = "10.0.0.4", username="pi", password="raspberry")
+            srv.chdir('public_html')
+            #srv.chdir('Desktop')
+            srv.put('siren.txt')
+            srv.close()
+            node_2 = "Excellent"
+        except:
+            node_2 = "Connection Error"
+                        
     #Update Current Signals		
     previous_light = current_light
     previous_aural = current_aural
@@ -136,6 +175,14 @@ class Window(QtGui.QWidget):
         self.activate_button.resize(self.activate_button.sizeHint())
         self.activate_button.move(125, 225)
         self.activate_button.clicked.connect(self.clicked_button)   #When clicked, call clicked_button
+        
+        #Test Button
+        QtGui.QToolTip.setFont(QtGui.QFont('SansSerif', 10))
+        self.test_button = QtGui.QPushButton('Test System', self)
+        self.test_button.setToolTip('This activates the system test')
+        self.test_button.resize(self.activate_button.sizeHint())
+        self.test_button.move(125, 265)
+        self.test_button.clicked.connect(self.clicked_test_button)   #When clicked, call clicked_button
         
         #Visual Dropdown Menu
         self.lbl = QtGui.QLabel("Visual Alerts", self)
@@ -273,10 +320,18 @@ class Window(QtGui.QWidget):
         self.duration_lbl.setFont(newfont)
         
         #Communication Status
-        self.comm_lbl = QtGui.QLabel("Communication Status:", self)
-        self.comm_lbl.move(0, 475)
-        self.comm = QtGui.QLabel("Excellent", self)
-        self.comm.move(155, 475)
+        self.node1_lbl = QtGui.QLabel("Node 1 Connection:", self)
+        self.node1_lbl.move(0, 475)
+        self.node2_lbl = QtGui.QLabel("Node 2 Connection:", self)
+        self.node2_lbl.move(0, 500)
+        self.node1 = QtGui.QLabel("Excellent", self)
+        self.node1.move(135, 475)
+        self.node1.setFont(newfont)
+        self.node1.resize(150, 20)
+        self.node2 = QtGui.QLabel("Excellent", self)
+        self.node2.move(135, 500)
+        self.node2.setFont(newfont)
+        self.node2.resize(150, 20)
         
         #Light Color
         self.visual_alert = QtGui.QLabel("%s" %current_light, self)
@@ -340,12 +395,10 @@ class Window(QtGui.QWidget):
     	global current_light
     	global current_aural
     	global comm_status
-    	global communication
-    	if comm_status == "O":
-    		communication = "Excellent"
-    	else:
-    		communication = "Lost"
-    	self.comm.setText(communication)
+    	global node_1
+        global node_2
+    	self.node1.setText(node_1)
+        self.node2.setText(node_2)
     	self.aural_alert.setText(current_aural)
     	self.visual_alert.setText(current_light)
     	set_state()
@@ -368,7 +421,23 @@ class Window(QtGui.QWidget):
         if (int(minutes) > 0) or (int(hours) > 0):
 			self.timer = QtCore.QTimer()
 			self.timer.singleShot((int(hours)*3600000) + (int(minutes)*60000), self.off_signal)
-			
+      
+    def clicked_test_button(self):
+        msg = QtGui.QMessageBox()
+        msg.setText("Please remove test jumper JP1 to deactivate the lights and mute the speaker.")
+        msg.addButton(QtGui.QMessageBox.Ok)
+        ret = msg.exec_()
+        
+        if ret == QtGui.QMessageBox.Ok:
+            self.clicked_ok()
+        
+    def clicked_ok(self):
+        global current_light
+    	global current_aural
+    	
+    	current_light = visual_selection
+    	current_aural = aural_selection
+        
     def off_signal(self):
 		global current_light
 		global current_aural
