@@ -55,12 +55,17 @@ def set_alerts():
             GPIO.output(20, True)
             GPIO.output(21, True)
         elif current_light == "Blue":           #blue on
+            GPIO.output(20, True)
+            GPIO.output(21, True)
             GPIO.output(16, False)
         elif current_light == "Yellow":         #yellow on
+            GPIO.output(16, True)
+            GPIO.output(21, True)            
             GPIO.output(20, False)
         elif current_light == "Red":            #red on
+            GPIO.output(16, True)
+            GPIO.output(20, True)            
             GPIO.output(21, False)
-        print current_light
             
     if current_aural != previous_aural:
         if current_aural == "No Alert":
