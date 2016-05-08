@@ -54,7 +54,7 @@ current_message = "no message"
 communication = "Excellent"
 comm_status = "O"
 node_1 = "Excellent"
-node_2 = "Excellent"
+node_2 = "Connection Error"
 
 #Sets the hardware in the Severe Weather Warning System
 def set_state():
@@ -76,10 +76,10 @@ def set_state():
         
         #Send Commands to Node_1
         try:
-            srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
-            #srv = pysftp.Connection(host = "10.248.214.248", username="pi", password="raspberry")
-            srv.chdir('public_html')
-            #srv.chdir('Desktop')
+            #srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
+            srv = pysftp.Connection(host = "fw-perez-1.engr.oregonstate.edu", username="pi", password="raspberry")
+            #srv.chdir('public_html')
+            srv.chdir('Desktop')
             srv.put('light.txt')
             srv.close()
             node_1 = "Excellent"
@@ -87,16 +87,16 @@ def set_state():
             node_1 = "Connection Error"
             
         #Send Commands to Node_2
-        try:
-            srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
-            #srv = pysftp.Connection(host = "10.248.214.248", username="pi", password="raspberry")
-            srv.chdir('public_html')
-            #srv.chdir('Desktop')
-            srv.put('light.txt')
-            srv.close()
-            node_2 = "Excellent"
-        except:
-            node_2 = "Connection Error"
+#        try:
+#            srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
+#            srv = pysftp.Connection(host = "fw-perez-2.engr.oregonstate.edu", username="pi", password="raspberry")
+#            #srv.chdir('public_html')
+#            srv.chdir('Desktop')
+#            #srv.put('light.txt')
+#            srv.close()
+#            node_2 = "Excellent"
+#        except:
+#            node_2 = "Connection Error"
             
 	#Activate Aural Alert
     if current_aural != previous_aural:          #Check for new aural command
@@ -108,10 +108,10 @@ def set_state():
         
         #Send Command to Node_1
         try:
-            srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
-            #srv = pysftp.Connection(host = "10.0.0.4", username="pi", password="raspberry")
-            srv.chdir('public_html')
-            #srv.chdir('Desktop')
+            #srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
+            srv = pysftp.Connection(host = "fw-perez-1.engr.oregonstate.edu", username="pi", password="raspberry")
+            #srv.chdir('public_html')
+            srv.chdir('Desktop')
             srv.put('siren.txt')
             srv.close()
             node_1 = "Excellent"
@@ -119,16 +119,16 @@ def set_state():
             node_1 = "Connection Error"
             
         #Send Command to Node_2
-        try:
-            srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
-            #srv = pysftp.Connection(host = "10.0.0.4", username="pi", password="raspberry")
-            srv.chdir('public_html')
-            #srv.chdir('Desktop')
-            srv.put('siren.txt')
-            srv.close()
-            node_2 = "Excellent"
-        except:
-            node_2 = "Connection Error"
+#        try:
+#            #srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
+#            srv = pysftp.Connection(host = "fw-perez-2.engr.oregonstate.edu", username="pi", password="raspberry")
+#            #srv.chdir('public_html')
+#            srv.chdir('Desktop')
+#            srv.put('siren.txt')
+#            srv.close()
+#            node_2 = "Excellent"
+#        except:
+#            node_2 = "Connection Error"
                         
     #Update Current Signals		
     previous_light = current_light
@@ -424,7 +424,7 @@ class Window(QtGui.QWidget):
       
     def clicked_test_button(self):
         msg = QtGui.QMessageBox()
-        msg.setText("Please remove test jumper JP1 to deactivate the lights and mute the speaker.")
+        msg.setText("Please remove test jumper JP1 to deactivate the lights, then mute the speaker.")
         msg.addButton(QtGui.QMessageBox.Ok)
         ret = msg.exec_()
         
