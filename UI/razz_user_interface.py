@@ -482,7 +482,7 @@ class background_functions(QtCore.QThread):
 		global previous_message
 		#Logs in to email account
 		mail = imaplib.IMAP4_SSL('imap.gmail.com')
-		mail.login('pwmcats@gmail.com', 'pussymoneyweed')
+		mail.login('pwmcats@gmail.com', 'severeweatherwarning')
 		mail.list()
 		mail.select("inbox") # connect to inbox.
 	
