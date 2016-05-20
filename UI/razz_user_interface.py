@@ -74,17 +74,17 @@ def set_state():
         light.write(str(current_light))
         light.close()
         
-        #Send Commands to Node_1
-#        try:
-#            #srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
-#            srv = pysftp.Connection(host = "fw-perez-1.engr.oregonstate.edu", username="pi", password="raspberry")
-#            #srv.chdir('public_html')
-#            srv.chdir('Desktop')
-#            srv.put('light.txt')
-#            srv.close()
-#            node_1 = "Excellent"
-#        except:
-#            node_1 = "Connection Error"
+        Send Commands to Node_1
+        try:
+            #srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
+            srv = pysftp.Connection(host = "fw-perez-1.engr.oregonstate.edu", username="pi", password="raspberry")
+            #srv.chdir('public_html')
+            srv.chdir('Desktop')
+            srv.put('light.txt')
+            srv.close()
+            node_1 = "Excellent"
+        except:
+            node_1 = "Connection Error"
             
         #Send Commands to Node_2
 #        try:
@@ -106,17 +106,17 @@ def set_state():
         aural.write(str(current_aural))
         aural.close()
         
-        #Send Command to Node_1
-#        try:
-#            #srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
-#            srv = pysftp.Connection(host = "fw-perez-1.engr.oregonstate.edu", username="pi", password="raspberry")
-#            #srv.chdir('public_html')
-#            srv.chdir('Desktop')
-#            srv.put('siren.txt')
-#            srv.close()
-#            node_1 = "Excellent"
-#        except:
-#            node_1 = "Connection Error"
+        Send Command to Node_1
+        try:
+            #srv = pysftp.Connection(host = "access.engr.oregonstate.edu", username="pereza", password="180642Ap?")
+            srv = pysftp.Connection(host = "fw-perez-1.engr.oregonstate.edu", username="pi", password="raspberry")
+            #srv.chdir('public_html')
+            srv.chdir('Desktop')
+            srv.put('siren.txt')
+            srv.close()
+            node_1 = "Excellent"
+        except:
+            node_1 = "Connection Error"
             
         #Send Command to Node_2
 #        try:
